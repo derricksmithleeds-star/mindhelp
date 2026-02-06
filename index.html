@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MindHelp</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--accent2:#f5a623;
+--green:#27ae60;--text:#eee;--muted:#999;--radius:12px;--shadow:0 2px 12px rgba(0,0,0,.3);
+}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+background:var(--bg);color:var(--text);font-size:16px;line-height:1.5;overflow-x:hidden}
+button{font-family:inherit;font-size:1rem;border:none;border-radius:var(--radius);
+padding:14px 20px;cursor:pointer;transition:all .2s;min-height:48px;min-width:48px;
+font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+button:active{transform:scale(.96)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#d63050}
+.btn-secondary{background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,.1)}
+.btn-secondary:hover{background:#1a4a80}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#219150}
+.btn-orange{background:var(--accent2);color:#111}
+.btn-orange:hover{background:#e09510}
+.btn-danger{background:#c0392b;color:#fff}
+.btn-danger:hover{background:#a93226}
+.btn-full{width:100%}
+.btn-lg{padding:18px 24px;font-size:1.1rem}
+textarea,input[type="text"]{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+border-radius:var(--radius);padding:14px;color:var(--text);font-size:1rem;font-family:inherit;
+resize:vertical;min-height:100px;line-height:1.5}
+textarea:focus,input[type="text"]:focus{outline:none;border-color:var(--accent)}
+input[type="text"]{min-height:auto}
+.card{background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:16px;
+box-shadow:var(--shadow)}
+.page{display:none;padding:16px 16px 100px;max-width:600px;margin:0 auto;animation:fadeIn .3s}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:1.5rem;margin-bottom:8px}
+h2{font-size:1.2rem;margin-bottom:12px;color:var(--muted)}
+h3{font-size:1.05rem;margin-bottom:8px}
+.streak-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green);
+color:#fff;padding:6px 14px;border-radius:20px;font-weight:700;font-size:.95rem}
+.track-badge{display:inline-block;padding:6px 14px;border-radius:20px;font-weight:700;font-size:.85rem}
+.track-momentum{background:var(--green);color:#fff}
+.track-reset{background:var(--accent2);color:#111}
+.track-emergency{background:var(--accent);color:#fff}
+.nav-bottom{position:fixed;bottom:0;left:0;right:0;background:var(--surface);
+border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:center;gap:8px;
+padding:10px 12px;z-index:100;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.nav-bottom button{flex:1;max-width:140px;padding:10px 8px;font-size:.8rem;border-radius:10px}
+.checkbox-row{display:flex;align-items:center;gap:12px;padding:12px 0;cursor:pointer;
+font-size:1rem;user-select:none}
+.checkbox-row input[type="checkbox"]{width:24px;height:24px;accent-color:var(--green);cursor:pointer}
+.radio-row{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;
+background:rgba(255,255,255,.05);border-radius:var(--radius);margin-bottom:8px;user-select:none}
+.radio-row:hover{background:rgba(255,255,255,.1)}
+.radio-row input[type="radio"]{width:20px;height:20px;accent-color:var(--accent);cursor:pointer}
+.timer-display{font-size:3rem;font-weight:700;text-align:center;padding:24px 0;
+font-variant-numeric:tabular-nums}
+.timer-controls{display:flex;gap:12px;justify-content:center}
+.progress-bar{height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin:12px 0}
+.progress-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}
+.mantra{background:rgba(233,69,96,.1);border-left:4px solid var(--accent);padding:16px;
+border-radius:0 var(--radius) var(--radius) 0;margin:16px 0;font-style:italic;line-height:1.6}
+.encouragement{text-align:center;padding:20px;font-size:1.1rem;color:var(--green)}
+.step-indicator{display:flex;gap:8px;margin-bottom:20px}
+.step-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
+.step-dot.active{background:var(--accent)}
+.step-dot.done{background:var(--green)}
+.spacer{height:16px}
+.muted{color:var(--muted)}
+.text-center{text-align:center}
+.mb-8{margin-bottom:8px}
+.mb-16{margin-bottom:16px}
+.mb-24{margin-bottom:24px}
+.mt-16{margin-top:16px}
+.flex-col{display:flex;flex-direction:column;gap:12px}
+.flex-row{display:flex;gap:12px;flex-wrap:wrap}
+.word-count{text-align:right;color:var(--muted);font-size:.85rem;margin-top:4px}
+.rating-row{display:flex;gap:8px;justify-content:center}
+.rating-btn{width:48px;height:48px;border-radius:50%;background:var(--card);color:var(--text);
+font-size:1.2rem;padding:0;border:2px solid transparent}
+.rating-btn.selected{border-color:var(--accent);background:var(--accent)}
+.chart-bar-container{display:flex;align-items:flex-end;gap:4px;height:120px;padding:8px 0}
+.chart-bar{flex:1;background:var(--green);border-radius:4px 4px 0 0;min-height:2px;transition:height .3s}
+.chart-labels{display:flex;gap:4px;font-size:.7rem;color:var(--muted)}
+.chart-labels span{flex:1;text-align:center}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:16px;text-align:center}
+.stat-card .num{font-size:2rem;font-weight:700}
+.stat-card .label{font-size:.8rem;color:var(--muted);margin-top:4px}
+.evidence-item{padding:10px 14px;background:rgba(39,174,96,.1);border-radius:var(--radius);
+margin-bottom:8px;font-size:.95rem;border-left:3px solid var(--green)}
+.breadcrumb{font-size:.85rem;color:var(--muted);margin-bottom:16px}
+.breadcrumb a{color:var(--accent);text-decoration:none;cursor:pointer}
+audio{display:none}
+</style>
+</head>
+<body>
+
+<!-- ===== PAGES ===== -->
+
+<!-- DASHBOARD -->
+<div id="pg-dashboard" class="page active">
+<div class="card text-center">
+<div class="muted mb-8" id="dash-date"></div>
+<h1>MindHelp</h1>
+<div class="spacer"></div>
+<div class="streak-badge" id="dash-streak">0 day streak</div>
+<div class="spacer"></div>
+<div id="dash-track-badge"></div>
+</div>
+<div class="card" id="dash-route-info"></div>
+<div class="flex-col" id="dash-nav-buttons"></div>
+<div class="spacer"></div>
+<div class="card">
+<h3>Today's Progress</h3>
+<div id="dash-today-status"></div>
+</div>
+</div>
+
+<!-- MORNING TIER 1 -->
+<div id="pg-morning" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Morning Check-In</div>
+<div class="step-indicator" id="morning-steps"></div>
+
+<div id="morning-step-1" class="card">
+<h2>Step 1: Blood Sugar Management</h2>
+<label class="checkbox-row"><input type="checkbox" id="morning-bs" onchange="morningCheck()"> Blood sugar checked and managed</label>
+<button class="btn-primary btn-full mt-16" id="morning-bs-next" disabled onclick="morningGoStep(2)">Next</button>
+</div>
+
+<div id="morning-step-2" class="card" style="display:none">
+<h2>Step 2: Meditation / Visualization (10 min)</h2>
+<p class="mantra">See yourself as the person who's already solved these problems. What does that version of you do today? How does he feel in his body?</p>
+<div class="timer-display" id="morning-med-timer">10:00</div>
+<div class="timer-controls">
+<button class="btn-secondary" id="morning-med-toggle" onclick="toggleTimer('morningMed')">Start</button>
+<button class="btn-secondary" onclick="resetTimer('morningMed')">Reset</button>
+</div>
+<textarea id="morning-med-notes" placeholder="Optional notes..." class="mt-16" rows="3"></textarea>
+<button class="btn-primary btn-full mt-16" onclick="morningGoStep(3)">Complete</button>
+</div>
+
+<div id="morning-step-3" class="card" style="display:none">
+<h2>Step 3: Freewriting (One page)</h2>
+<p class="muted mb-8">Dump the worry thoughts here</p>
+<textarea id="morning-freewrite" placeholder="Write freely..." rows="8" oninput="updateWordCount('morning-freewrite','morning-wc')"></textarea>
+<div class="word-count" id="morning-wc">0 words (aim for ~500)</div>
+<button class="btn-green btn-full btn-lg mt-16" onclick="completeMorning()">Done Writing - Complete Morning</button>
+</div>
+
+<div id="morning-complete" class="card" style="display:none">
+<div class="encouragement">Tier 1 Morning Complete &#10003;</div>
+<p class="text-center muted mb-16">Your streak has been updated.</p>
+<button class="btn-primary btn-full" onclick="nav('tier2')">Pick a Tier 2 Action</button>
+<div class="spacer"></div>
+<button class="btn-secondary btn-full" onclick="nav('dashboard')">Done for Now</button>
+</div>
+</div>
+
+<!-- TIER 2 -->
+<div id="pg-tier2" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Tier 2: Daily Action</div>
+<div class="card">
+<h2>Pick ONE action today</h2>
+<p class="muted mb-16" id="tier2-day-label"></p>
+<div id="tier2-options"></div>
+</div>
+<div id="tier2-activity" class="card" style="display:none">
+<h3 id="tier2-selected-label"></h3>
+<div class="timer-display" id="tier2-timer">30:00</div>
+<div class="timer-controls mb-16">
+<button class="btn-secondary" id="tier2-timer-toggle" onclick="toggleTimer('tier2')">Start</button>
+<button class="btn-secondary" onclick="resetTimer('tier2')">Reset</button>
+</div>
+<textarea id="tier2-notes" placeholder="What did you do?" rows="4"></textarea>
+<button class="btn-green btn-full btn-lg mt-16" onclick="completeTier2()">Log Completion</button>
+</div>
+<div id="tier2-done" class="card" style="display:none">
+<div class="encouragement" id="tier2-done-msg"></div>
+<button class="btn-primary btn-full" onclick="nav('dashboard')">Back to Dashboard</button>
+</div>
+</div>
+
+<!-- EVENING PROTOCOL -->
+<div id="pg-evening" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Evening Protocol</div>
+<div class="step-indicator" id="evening-steps"></div>
+
+<div id="evening-step-1" class="card">
+<h2>Step 1: Evidence Collection</h2>
+<p class="muted mb-8">What's one thing you actually did today? (Even tiny)</p>
+<textarea id="evening-evidence" placeholder="I..." rows="3"></textarea>
+<button class="btn-primary btn-full mt-16" onclick="eveningGoStep(2)">Next</button>
+</div>
+
+<div id="evening-step-2" class="card" style="display:none">
+<h2>Step 2: Thought Pattern Check</h2>
+<textarea id="evening-thought" placeholder="What thought kept running today? Or what thought did you catch before it spiraled?" rows="4"></textarea>
+<button class="btn-primary btn-full mt-16" onclick="eveningGoStep(3)">Next</button>
+</div>
+
+<div id="evening-step-3" class="card" style="display:none">
+<h2>Step 3: Tomorrow Setup</h2>
+<textarea id="evening-tomorrow" placeholder="Tomorrow's ONE thing:" rows="3"></textarea>
+<button class="btn-primary btn-full mt-16" onclick="eveningGoStep(4)">Next</button>
+</div>
+
+<div id="evening-step-4" class="card" style="display:none">
+<h2>Step 4: Urge Check</h2>
+<p class="mb-16">Feeling urge-y right now?</p>
+<div class="flex-row">
+<button class="btn-orange" style="flex:1" onclick="nav('urge');eveningGoStep(5)">Yes</button>
+<button class="btn-secondary" style="flex:1" onclick="eveningGoStep(5)">No</button>
+</div>
+</div>
+
+<div id="evening-step-5" class="card" style="display:none">
+<h2>Step 5: Evening Activity</h2>
+<div id="evening-activity-content"></div>
+</div>
+
+<div id="evening-bs" class="card" style="display:none">
+<h2>Evening Blood Sugar</h2>
+<label class="checkbox-row"><input type="checkbox" id="evening-bs-check" onchange="eveningBsCheck()"> Evening blood sugar managed</label>
+</div>
+
+<div id="evening-reflect" class="card" style="display:none">
+<h2>5-Min Reflection</h2>
+<p class="muted mb-8">What's one piece of evidence today that you're capable? (Even tiny things count)</p>
+<textarea id="evening-reflect-text" rows="3"></textarea>
+<button class="btn-green btn-full btn-lg mt-16" onclick="completeEvening()">Complete Evening Protocol</button>
+</div>
+
+<div id="evening-complete" class="card" style="display:none">
+<div class="encouragement">Evening Protocol Complete &#10003;</div>
+<p class="text-center muted mb-8">You made it through today.</p>
+<p class="text-center"><span class="streak-badge" id="evening-streak-display">0 day streak</span></p>
+<div class="spacer"></div>
+<button class="btn-primary btn-full" onclick="nav('dashboard')">Back to Dashboard</button>
+</div>
+</div>
+
+<!-- EMERGENCY -->
+<div id="pg-emergency" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Emergency</div>
+<div class="card">
+<h2>What's happening?</h2>
+<div class="flex-col">
+<button class="btn-danger btn-full btn-lg" onclick="showEmergency('financial')">Financial Worry</button>
+<button class="btn-danger btn-full btn-lg" onclick="showEmergency('relationship')">Relationship Doubt / Regret</button>
+<button class="btn-danger btn-full btn-lg" onclick="showEmergency('frozen')">Frozen / Procrastinating</button>
+<button class="btn-danger btn-full btn-lg" onclick="showEmergency('lack')">Creating from Lack Overwhelm</button>
+</div>
+</div>
+</div>
+
+<!-- EMERGENCY: FINANCIAL -->
+<div id="pg-em-financial" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('emergency')">Emergency</a> &rsaquo; Financial Worry</div>
+<div class="card">
+<div class="mantra">This feeling is information, not truth. My current situation is temporary. What's the smallest money-smart action I can take right now?</div>
+<h3 class="mb-16">Pick one action:</h3>
+<div class="flex-col">
+<button class="btn-secondary btn-full" onclick="logEmergencyAction('financial','Applied for one job')">Apply for one job</button>
+<button class="btn-secondary btn-full" onclick="logEmergencyAction('financial','Sent one email')">Send one email</button>
+<button class="btn-secondary btn-full" onclick="logEmergencyAction('financial','Saved £5')">Save £5</button>
+</div>
+<div class="spacer"></div>
+<input type="text" id="em-fin-other" placeholder="Other action...">
+<button class="btn-primary btn-full mt-16" onclick="logEmergencyAction('financial',document.getElementById('em-fin-other').value||'Other action')">I did one thing</button>
+</div>
+</div>
+
+<!-- EMERGENCY: RELATIONSHIP -->
+<div id="pg-em-relationship" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('emergency')">Emergency</a> &rsaquo; Relationship Doubt</div>
+<div class="card">
+<div class="mantra">I made the best decision I could with the awareness I had then. Who I was then doesn't limit who I'm becoming now.</div>
+<textarea id="em-rel-text" placeholder="What would I need to believe about myself to be ready for a relationship like that?" rows="5"></textarea>
+<button class="btn-green btn-full btn-lg mt-16" onclick="logEmergencyAction('relationship',document.getElementById('em-rel-text').value)">Complete</button>
+</div>
+</div>
+
+<!-- EMERGENCY: FROZEN -->
+<div id="pg-em-frozen" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('emergency')">Emergency</a> &rsaquo; Frozen</div>
+<div class="card">
+<div class="mantra">I don't need to do this perfectly. I need to do it badly and learn. Five minutes of imperfect action beats five hours of perfect planning.</div>
+<p class="text-center muted mb-8">Do literally anything related to any goal. Stop when timer rings.</p>
+<div class="timer-display" id="frozen-timer">5:00</div>
+<div class="timer-controls">
+<button class="btn-primary" id="frozen-timer-toggle" onclick="toggleTimer('frozen')">Start</button>
+<button class="btn-secondary" onclick="resetTimer('frozen')">Reset</button>
+</div>
+<div class="spacer"></div>
+<div id="frozen-done-msg" style="display:none" class="encouragement">You'll usually keep going now. But if not, that's fine too.</div>
+<button class="btn-secondary btn-full mt-16" onclick="logEmergencyAction('frozen','Did 5 min action');nav('dashboard')">Done - Back to Dashboard</button>
+</div>
+</div>
+
+<!-- EMERGENCY: LACK -->
+<div id="pg-em-lack" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('emergency')">Emergency</a> &rsaquo; Creating from Lack</div>
+<div class="card">
+<div class="mantra">I'm not creating to escape scarcity - I'm creating because I have something worth sharing. The money will follow the value, not the desperation.</div>
+<h3 class="mb-16">If money wasn't a factor, which of these projects would you still care about?</h3>
+<label class="radio-row"><input type="radio" name="lack-project" value="Job search"> Job search</label>
+<label class="radio-row"><input type="radio" name="lack-project" value="Content creation"> Content creation</label>
+<label class="radio-row"><input type="radio" name="lack-project" value="Agency"> Agency</label>
+<label class="radio-row"><input type="radio" name="lack-project" value="Other"> Other</label>
+<button class="btn-green btn-full btn-lg mt-16" onclick="logLackEmergency()">Focus There</button>
+</div>
+</div>
+
+<!-- URGE PROTOCOL -->
+<div id="pg-urge" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Urge Protocol</div>
+<div id="urge-step-1" class="card">
+<h2>Step 1: Identify</h2>
+<p class="muted mb-16">What's calling right now?</p>
+<div class="flex-col">
+<button class="btn-secondary btn-full" onclick="selectUrgeType('Junk food')">Junk food / comfort eating</button>
+<button class="btn-secondary btn-full" onclick="selectUrgeType('Porn')">Porn / self-gratification</button>
+<button class="btn-secondary btn-full" onclick="selectUrgeType('Contact ex')">Contact ex</button>
+</div>
+<div class="spacer"></div>
+<input type="text" id="urge-other" placeholder="Other...">
+<button class="btn-secondary btn-full mt-16" onclick="selectUrgeType(document.getElementById('urge-other').value||'Other')">Select Other</button>
+</div>
+
+<div id="urge-step-2" class="card" style="display:none">
+<h2>Step 2: Name the State</h2>
+<p class="muted mb-16">What are you actually feeling?</p>
+<div class="flex-col">
+<button class="btn-secondary btn-full" onclick="selectUrgeState('Lonely')">Lonely</button>
+<button class="btn-secondary btn-full" onclick="selectUrgeState('Anxious/worried')">Anxious / worried (usually money)</button>
+<button class="btn-secondary btn-full" onclick="selectUrgeState('Bored/restless')">Bored / restless</button>
+<button class="btn-secondary btn-full" onclick="selectUrgeState('Grief')">Grief surfacing</button>
+<button class="btn-secondary btn-full" onclick="selectUrgeState('Uncomfortable')">Physically uncomfortable</button>
+<button class="btn-secondary btn-full" onclick="selectUrgeState('Empty')">Just... empty</button>
+</div>
+</div>
+
+<div id="urge-step-3" class="card" style="display:none">
+<h2>Step 3: The Fork</h2>
+<div class="flex-col">
+<button class="btn-primary btn-full btn-lg" onclick="urgeFork('A')">Option A: Go ahead - make it conscious</button>
+<button class="btn-orange btn-full btn-lg" onclick="urgeFork('B')">Option B: Try something else first</button>
+<button class="btn-danger btn-full btn-lg" onclick="urgeFork('C')">Option C: Emergency mode</button>
+</div>
+</div>
+</div>
+
+<!-- URGE OPTION A -->
+<div id="pg-urge-a" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('urge')">Urge</a> &rsaquo; Option A</div>
+<div class="card">
+<h2>Make it conscious</h2>
+<p class="muted mb-8">Set a 20-minute timer. Do the thing. When timer goes off, come back here.</p>
+<div class="timer-display" id="urgeA-timer">20:00</div>
+<div class="timer-controls mb-16">
+<button class="btn-secondary" id="urgeA-timer-toggle" onclick="toggleTimer('urgeA')">Start</button>
+<button class="btn-secondary" onclick="resetTimer('urgeA')">Reset</button>
+</div>
+</div>
+<div id="urgeA-after" class="card" style="display:none">
+<h3 class="mb-8">How did that go? (1-5)</h3>
+<div class="rating-row mb-16" id="urgeA-rating"></div>
+<textarea id="urgeA-need" placeholder="What I was really needing:" rows="3"></textarea>
+<label class="checkbox-row mt-16"><input type="checkbox" id="urgeA-onemore"> Now do ONE other thing (even tiny) so this isn't the last action</label>
+<button class="btn-green btn-full btn-lg mt-16" onclick="completeUrgeA()">Log and Move On</button>
+<p class="text-center muted mt-16">No shame. You made it conscious. That matters.</p>
+</div>
+</div>
+
+<!-- URGE OPTION B -->
+<div id="pg-urge-b" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('urge')">Urge</a> &rsaquo; Option B</div>
+<div class="card">
+<h2>Try something else first</h2>
+<p class="muted mb-16">Pick a 5-minute alternative:</p>
+<div id="urgeB-alternatives" class="flex-col"></div>
+<div class="spacer"></div>
+<div class="timer-display" id="urgeB-timer">5:00</div>
+<div class="timer-controls">
+<button class="btn-secondary" id="urgeB-timer-toggle" onclick="toggleTimer('urgeB')">Start</button>
+<button class="btn-secondary" onclick="resetTimer('urgeB')">Reset</button>
+</div>
+</div>
+<div id="urgeB-after" class="card" style="display:none">
+<h3 class="mb-16">Is the urge still there?</h3>
+<div class="flex-row">
+<button class="btn-primary" style="flex:1" onclick="nav('urge-a')">Yes - Option A</button>
+<button class="btn-green" style="flex:1" onclick="completeUrgeB()">No - I rode it out!</button>
+</div>
+</div>
+</div>
+
+<!-- CONTACT EX SPECIAL -->
+<div id="pg-contact-ex" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('urge')">Urge</a> &rsaquo; Contact Ex</div>
+<div class="card">
+<h2>THE 24-HOUR RULE</h2>
+<p class="muted mb-16">This urge is real, but you don't need to act on it right now. Let's put a pin in it.</p>
+<textarea id="ex-message" placeholder="Write the message you want to send (not sending it)" rows="4" class="mb-16"></textarea>
+<textarea id="ex-hoping" placeholder="What are you hoping will happen if you reach out?" rows="3" class="mb-16"></textarea>
+<textarea id="ex-patterns" placeholder="What will ACTUALLY happen based on past patterns?" rows="3"></textarea>
+</div>
+<div class="card">
+<h3 class="mb-16">Choose:</h3>
+<div class="flex-col">
+<button class="btn-primary btn-full btn-lg" onclick="contactExWait()">Send it tomorrow (24hr rule)</button>
+<button class="btn-orange btn-full btn-lg" onclick="showExSubstitute()">Substitute the need</button>
+<button class="btn-danger btn-full btn-lg" onclick="showEmergency('relationship')">Emergency - grief is overwhelming</button>
+</div>
+</div>
+<div id="ex-substitute" class="card" style="display:none">
+<h3 class="mb-16">What are you actually wanting?</h3>
+<div class="flex-col">
+<button class="btn-secondary btn-full" onclick="logExSubstitute('Comfort - text a friend instead')">Comfort - Text a friend instead</button>
+<button class="btn-secondary btn-full" onclick="logExSubstitute('Validation - journal it')">Validation - Journal prompt</button>
+<button class="btn-secondary btn-full" onclick="logExSubstitute('Not alone - evening protocol')">Not alone - Evening protocol</button>
+<button class="btn-secondary btn-full" onclick="logExSubstitute('Closure - unsent letter')">Closure - Unsent letter exercise</button>
+</div>
+</div>
+</div>
+
+<!-- WEEKLY REVIEW -->
+<div id="pg-weekly" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Weekly Review</div>
+<div class="card">
+<h2>Tier 3: Weekly Progress Check</h2>
+<div id="weekly-stats" class="stat-grid mb-16"></div>
+</div>
+<div class="card">
+<h3 class="mb-8">Did you do Tier 1 work at least 5 days?</h3>
+<div class="flex-row mb-16">
+<button class="btn-secondary" style="flex:1" id="weekly-q1-yes" onclick="weeklyAnswer(1,true)">Yes</button>
+<button class="btn-secondary" style="flex:1" id="weekly-q1-no" onclick="weeklyAnswer(1,false)">No</button>
+</div>
+<h3 class="mb-8">Did you complete at least 3 Tier 2 actions?</h3>
+<div class="flex-row mb-16">
+<button class="btn-secondary" style="flex:1" id="weekly-q2-yes" onclick="weeklyAnswer(2,true)">Yes</button>
+<button class="btn-secondary" style="flex:1" id="weekly-q2-no" onclick="weeklyAnswer(2,false)">No</button>
+</div>
+<textarea id="weekly-learned" placeholder="What's one thing you learned about yourself this week?" rows="4"></textarea>
+<button class="btn-green btn-full btn-lg mt-16" onclick="completeWeekly()">Complete Weekly Review</button>
+</div>
+<div class="card">
+<h3 class="mb-8">Weekly Trend</h3>
+<div id="weekly-chart"></div>
+</div>
+</div>
+
+<!-- TRACKING DASHBOARD -->
+<div id="pg-tracking" class="page">
+<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Progress</div>
+<div class="card">
+<h2>Current Status</h2>
+<div class="stat-grid" id="tracking-status"></div>
+</div>
+<div class="card">
+<h3 class="mb-8">Urge Log (This Week)</h3>
+<div id="tracking-urges"></div>
+</div>
+<div class="card">
+<h3 class="mb-8">Evidence Bank</h3>
+<div id="tracking-evidence"></div>
+</div>
+<div class="card">
+<h3 class="mb-8">Tier 1 Completion (Last 4 Weeks)</h3>
+<div id="tracking-chart"></div>
+</div>
+<div class="card">
+<h3 class="mb-8">Weekly Summary</h3>
+<p id="tracking-summary" class="muted"></p>
+</div>
+<div class="card">
+<h3 class="mb-8">30-Day Goals</h3>
+<div id="tracking-goals"></div>
+</div>
+</div>
+
+<!-- EMERGENCY DONE -->
+<div id="pg-em-done" class="page">
+<div class="card text-center">
+<div class="encouragement" id="em-done-msg">You did something. That matters.</div>
+<button class="btn-primary btn-full mt-16" onclick="nav('dashboard')">Back to Dashboard</button>
+</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="nav-bottom">
+<button class="btn-secondary" onclick="nav('dashboard')">Home</button>
+<button class="btn-danger" onclick="nav('emergency')">EMERGENCY</button>
+<button class="btn-orange" onclick="nav('urge')">URGE</button>
+<button class="btn-secondary" onclick="nav('tracking')">Progress</button>
+</div>
+
+<!-- TIMER AUDIO -->
+<audio id="timer-audio" preload="auto">
+<source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACA" type="audio/wav">
+</audio>
+
+<script>
+// ===== DATA LAYER =====
+const STORE_KEY = 'mindhelp_data';
+function defaultData(){return{streak:0,dailyLogs:[],weeklyReviews:[],urgeLog:[],evidenceBank:[],contactExLog:[],lastTrack:'reset'}}
+function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||defaultData()}catch(e){return defaultData()}}
+function save(d){localStorage.setItem(STORE_KEY,JSON.stringify(d))}
+let D = load();
+
+function today(){return new Date().toISOString().slice(0,10)}
+function todayLog(){return D.dailyLogs.find(l=>l.date===today())}
+function getOrCreateToday(){
+let log=todayLog();
+if(!log){log={date:today(),tier1Morning:false,tier1Evening:false,tier2Done:false,tier2Action:'',track:getTrack(),evidence:'',thoughts:'',tomorrow:'',emergencies:[],morningDone:false,eveningDone:false};D.dailyLogs.push(log);save(D)}
+return log;
+}
+
+function getTrack(){
+const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+const yd=yesterday.toISOString().slice(0,10);
+const ylog=D.dailyLogs.find(l=>l.date===yd);
+if(!ylog)return'reset';
+if(ylog.eveningDone&&ylog.tier1Morning)return'momentum';
+if(ylog.emergencies&&ylog.emergencies.length>1)return'emergency';
+return'reset';
+}
+
+function calcStreak(){
+let streak=0;const d=new Date();
+for(let i=0;i<365;i++){
+const dt=new Date(d);dt.setDate(dt.getDate()-i);
+const ds=dt.toISOString().slice(0,10);
+const log=D.dailyLogs.find(l=>l.date===ds);
+if(log&&log.tier1Morning)streak++;else if(i>0)break;
+}
+D.streak=streak;save(D);return streak;
+}
+
+function thisWeekLogs(){
+const now=new Date();const dow=now.getDay()||7;
+const mon=new Date(now);mon.setDate(mon.getDate()-(dow-1));mon.setHours(0,0,0,0);
+return D.dailyLogs.filter(l=>new Date(l.date)>=mon);
+}
+
+function thisWeekUrges(){
+const now=new Date();const dow=now.getDay()||7;
+const mon=new Date(now);mon.setDate(mon.getDate()-(dow-1));mon.setHours(0,0,0,0);
+return D.urgeLog.filter(u=>new Date(u.date)>=mon);
+}
+
+// ===== NAVIGATION =====
+function nav(page){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+const el=document.getElementById('pg-'+page);
+if(el){el.classList.add('active');window.scrollTo(0,0)}
+if(page==='dashboard')renderDashboard();
+if(page==='tier2')renderTier2();
+if(page==='evening')renderEvening();
+if(page==='weekly')renderWeekly();
+if(page==='tracking')renderTracking();
+if(page==='urge')resetUrge();
+if(page==='morning')renderMorning();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+const log=getOrCreateToday();
+const streak=calcStreak();
+const track=log.track||getTrack();
+const hour=new Date().getHours();
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const d=new Date();
+
+document.getElementById('dash-date').textContent=days[d.getDay()]+', '+months[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+document.getElementById('dash-streak').textContent=streak+' day streak';
+
+const tb=document.getElementById('dash-track-badge');
+const tl={momentum:'Momentum Track',reset:'Reset Track',emergency:'Emergency Mode'};
+tb.innerHTML='<span class="track-badge track-'+track+'">'+tl[track]+'</span>';
+
+// Route info
+const ri=document.getElementById('dash-route-info');
+if(track==='momentum')ri.innerHTML='<p>You\'re on <b>Momentum Track</b> - keep the streak going!</p>';
+else if(track==='emergency')ri.innerHTML='<p><b>Emergency Mode</b> - survival is success. Only blood sugar is required today.</p>';
+else ri.innerHTML='<p><b>Reset Track</b> - just get back on. Minimum version today.</p>';
+
+// Nav buttons
+const nb=document.getElementById('dash-nav-buttons');
+let btns='';
+if(!log.tier1Morning&&hour<17)btns+='<button class="btn-primary btn-full btn-lg" onclick="nav(\'morning\')">Morning Check-In</button>';
+else if(log.tier1Morning&&!log.tier2Done)btns+='<button class="btn-primary btn-full btn-lg" onclick="nav(\'tier2\')">Midday - Pick Tier 2 Action</button>';
+if(hour>=17||log.tier1Morning)btns+='<button class="btn-secondary btn-full btn-lg" onclick="nav(\'evening\')">'+(log.eveningDone?'Evening Protocol (Done)':'Evening Protocol')+'</button>';
+if(d.getDay()===0)btns+='<button class="btn-secondary btn-full btn-lg" onclick="nav(\'weekly\')">Weekly Review (Sunday)</button>';
+btns+='<button class="btn-secondary btn-full" onclick="switchTrack()">Switch to '+(track==='emergency'?'Reset':'Emergency')+' Mode</button>';
+nb.innerHTML=btns;
+
+// Today status
+const ts=document.getElementById('dash-today-status');
+ts.innerHTML='<p>Morning Tier 1: '+(log.tier1Morning?'<span style="color:var(--green)">Complete</span>':'Pending')+'</p>'+
+'<p>Tier 2 Action: '+(log.tier2Done?'<span style="color:var(--green)">'+log.tier2Action+'</span>':'Not yet')+'</p>'+
+'<p>Evening Protocol: '+(log.eveningDone?'<span style="color:var(--green)">Complete</span>':'Pending')+'</p>';
+}
+
+function switchTrack(){
+const log=getOrCreateToday();
+log.track=log.track==='emergency'?'reset':'emergency';
+save(D);renderDashboard();
+}
+
+// ===== MORNING =====
+function renderMorning(){
+const log=getOrCreateToday();
+if(log.tier1Morning){morningGoStep(4);return}
+morningGoStep(1);
+renderStepDots('morning-steps',3,0);
+}
+function morningCheck(){
+document.getElementById('morning-bs-next').disabled=!document.getElementById('morning-bs').checked;
+}
+function morningGoStep(s){
+for(let i=1;i<=3;i++){const el=document.getElementById('morning-step-'+i);if(el)el.style.display='none'}
+document.getElementById('morning-complete').style.display='none';
+if(s<=3){document.getElementById('morning-step-'+s).style.display='block';renderStepDots('morning-steps',3,s-1)}
+else document.getElementById('morning-complete').style.display='block';
+}
+function completeMorning(){
+const log=getOrCreateToday();
+log.tier1Morning=true;log.morningDone=true;
+log.freewrite=document.getElementById('morning-freewrite').value;
+log.medNotes=document.getElementById('morning-med-notes').value;
+save(D);calcStreak();morningGoStep(4);
+}
+
+// ===== TIER 2 =====
+let selectedTier2='';
+function renderTier2(){
+const dow=new Date().getDay();
+const label=document.getElementById('tier2-day-label');
+const opts=document.getElementById('tier2-options');
+document.getElementById('tier2-activity').style.display='none';
+document.getElementById('tier2-done').style.display='none';
+let options=[],duration=30;
+if([1,3,5].includes(dow)){
+label.textContent='Monday/Wednesday/Friday - Business/Career';
+options=['30 min job applications (one application, done properly)','30 min content website (one piece planned/created)','30 min client outreach for agency'];
+duration=30;
+}else if([2,4].includes(dow)){
+label.textContent='Tuesday/Thursday - Processing';
+options=['20 min relationship journaling','20 min financial reality check'];
+duration=20;
+}else{
+label.textContent='Weekend - Creative Recovery';
+options=['Work on one piece of content that excites you','Physical movement (walk, gym, anything)'];
+duration=30;
+}
+opts.innerHTML=options.map(o=>'<label class="radio-row"><input type="radio" name="tier2opt" value="'+o+'" onchange="selectTier2(this.value,'+duration+')"> '+o+'</label>').join('');
+}
+function selectTier2(val,dur){
+selectedTier2=val;
+document.getElementById('tier2-activity').style.display='block';
+document.getElementById('tier2-selected-label').textContent=val;
+initTimer('tier2',dur*60);
+}
+function completeTier2(){
+const log=getOrCreateToday();
+log.tier2Done=true;log.tier2Action=selectedTier2;
+log.tier2Notes=document.getElementById('tier2-notes').value;
+save(D);
+document.getElementById('tier2-activity').style.display='none';
+document.getElementById('tier2-done').style.display='block';
+const track=log.track||getTrack();
+document.getElementById('tier2-done-msg').textContent=track==='momentum'?"Great! You're building the frequency.":"You did the thing. Tomorrow you're back on Momentum.";
+}
+
+// ===== EVENING =====
+function renderEvening(){
+const log=getOrCreateToday();
+if(log.eveningDone){
+hideAllEveningSteps();
+document.getElementById('evening-complete').style.display='block';
+document.getElementById('evening-streak-display').textContent=D.streak+' day streak';
+return;
+}
+eveningGoStep(1);renderStepDots('evening-steps',5,0);
+}
+function hideAllEveningSteps(){
+for(let i=1;i<=5;i++){const el=document.getElementById('evening-step-'+i);if(el)el.style.display='none'}
+document.getElementById('evening-bs').style.display='none';
+document.getElementById('evening-reflect').style.display='none';
+document.getElementById('evening-complete').style.display='none';
+}
+function eveningGoStep(s){
+hideAllEveningSteps();
+if(s<=5){
+document.getElementById('evening-step-'+s).style.display='block';
+renderStepDots('evening-steps',5,s-1);
+if(s===5)renderEveningActivity();
+}
+if(s===6){document.getElementById('evening-bs').style.display='block'}
+if(s===7){document.getElementById('evening-reflect').style.display='block'}
+}
+function eveningBsCheck(){
+if(document.getElementById('evening-bs-check').checked)eveningGoStep(7);
+}
+function renderEveningActivity(){
+const track=getOrCreateToday().track||getTrack();
+const c=document.getElementById('evening-activity-content');
+if(track==='momentum'){
+c.innerHTML='<p class="muted mb-16">20-30 min creative/future work</p>'+
+'<label class="radio-row"><input type="radio" name="evact" value="Content creation"> Content creation</label>'+
+'<label class="radio-row"><input type="radio" name="evact" value="Business planning"> Business planning</label>'+
+'<label class="radio-row"><input type="radio" name="evact" value="Website work"> Website work</label>'+
+'<div class="timer-display" id="evact-timer">25:00</div>'+
+'<div class="timer-controls mb-16"><button class="btn-secondary" id="evact-timer-toggle" onclick="toggleTimer(\'evact\')">Start</button><button class="btn-secondary" onclick="resetTimer(\'evact\')">Reset</button></div>'+
+'<button class="btn-primary btn-full" onclick="eveningGoStep(6)">Done - Continue</button>';
+initTimer('evact',25*60);
+}else if(track==='reset'){
+c.innerHTML='<p class="muted mb-16">15 min processing</p>'+
+'<label class="radio-row"><input type="radio" name="evact" value="Grief journaling"> Grief journaling</label>'+
+'<label class="radio-row"><input type="radio" name="evact" value="Gentle reflection"> Gentle reflection</label>'+
+'<div class="timer-display" id="evact-timer">15:00</div>'+
+'<div class="timer-controls mb-16"><button class="btn-secondary" id="evact-timer-toggle" onclick="toggleTimer(\'evact\')">Start</button><button class="btn-secondary" onclick="resetTimer(\'evact\')">Reset</button></div>'+
+'<button class="btn-primary btn-full" onclick="eveningGoStep(6)">Done - Continue</button>';
+initTimer('evact',15*60);
+}else{
+c.innerHTML='<p class="muted mb-16">Rest is productive. Pick one comfort thing:</p>'+
+'<label class="radio-row"><input type="radio" name="evact" value="Read"> Read something</label>'+
+'<label class="radio-row"><input type="radio" name="evact" value="Music"> Listen to music</label>'+
+'<label class="radio-row"><input type="radio" name="evact" value="Nothing"> Nothing - just early bed</label>'+
+'<button class="btn-primary btn-full mt-16" onclick="eveningGoStep(6)">Done - Continue</button>';
+}
+}
+function completeEvening(){
+const log=getOrCreateToday();
+log.tier1Evening=true;log.eveningDone=true;
+const ev=document.getElementById('evening-evidence').value;
+if(ev){log.evidence=ev;D.evidenceBank.push({date:today(),text:ev})}
+log.thoughts=document.getElementById('evening-thought').value;
+log.tomorrow=document.getElementById('evening-tomorrow').value;
+const refl=document.getElementById('evening-reflect-text').value;
+if(refl)log.reflection=refl;
+save(D);calcStreak();
+hideAllEveningSteps();
+document.getElementById('evening-complete').style.display='block';
+document.getElementById('evening-streak-display').textContent=D.streak+' day streak';
+}
+
+// ===== EMERGENCY =====
+function showEmergency(type){nav('em-'+type)}
+function logEmergencyAction(type,action){
+const log=getOrCreateToday();
+log.emergencies.push({type,action,time:new Date().toISOString()});
+save(D);
+document.getElementById('em-done-msg').textContent=
+type==='financial'?"You took action. That's what capable people do.":
+type==='relationship'?"Your awareness is growing. That's real progress.":
+type==='frozen'?"You moved. That's all it takes to break the freeze.":
+"You refocused. The value leads.";
+nav('em-done');
+}
+function logLackEmergency(){
+const sel=document.querySelector('input[name="lack-project"]:checked');
+if(!sel)return;
+logEmergencyAction('lack','Focus: '+sel.value);
+}
+
+// ===== URGE PROTOCOL =====
+let currentUrge={type:'',state:'',option:'',outcome:'',rating:0};
+function resetUrge(){
+currentUrge={type:'',state:'',option:'',outcome:'',rating:0};
+document.getElementById('urge-step-1').style.display='block';
+document.getElementById('urge-step-2').style.display='none';
+document.getElementById('urge-step-3').style.display='none';
+}
+function selectUrgeType(t){
+currentUrge.type=t;
+if(t==='Contact ex'){nav('contact-ex');return}
+document.getElementById('urge-step-1').style.display='none';
+document.getElementById('urge-step-2').style.display='block';
+}
+function selectUrgeState(s){
+currentUrge.state=s;
+document.getElementById('urge-step-2').style.display='none';
+document.getElementById('urge-step-3').style.display='block';
+}
+function urgeFork(opt){
+currentUrge.option=opt;
+if(opt==='A'){
+nav('urge-a');
+initTimer('urgeA',20*60);
+document.getElementById('urgeA-after').style.display='none';
+const rr=document.getElementById('urgeA-rating');
+rr.innerHTML='';
+for(let i=1;i<=5;i++){
+const b=document.createElement('button');b.className='rating-btn';b.textContent=i;
+b.onclick=function(){currentUrge.rating=i;document.querySelectorAll('#urgeA-rating .rating-btn').forEach(x=>x.classList.remove('selected'));this.classList.add('selected')};
+rr.appendChild(b);
+}
+}else if(opt==='B'){
+nav('urge-b');
+initTimer('urgeB',5*60);
+document.getElementById('urgeB-after').style.display='none';
+renderUrgeAlternatives();
+}else{
+nav('emergency');
+}
+}
+function renderUrgeAlternatives(){
+const c=document.getElementById('urgeB-alternatives');
+let alts=[];
+if(currentUrge.type==='Junk food'){
+alts=['Drink full glass water + wait 2 min','Make tea/coffee','Eat something allowed but satisfying','5-min angry walk'];
+}else if(currentUrge.type==='Porn'){
+alts=['Cold water on face + 10 push-ups','5-min angry journaling','Text someone random chat','One angry song + movement'];
+}else{
+alts=['Write everything out (not to anyone)','Text someone else instead','5-min walk away from phone','Quick burst of exercise'];
+}
+c.innerHTML=alts.map(a=>'<label class="radio-row"><input type="radio" name="urgeBalt" value="'+a+'"> '+a+'</label>').join('');
+}
+function completeUrgeA(){
+currentUrge.outcome='conscious';
+D.urgeLog.push({date:today(),time:new Date().toISOString(),...currentUrge,need:document.getElementById('urgeA-need').value});
+save(D);nav('dashboard');
+}
+function completeUrgeB(){
+currentUrge.outcome='rode-it-out';
+D.urgeLog.push({date:today(),time:new Date().toISOString(),...currentUrge});
+save(D);
+document.getElementById('urgeB-after').style.display='none';
+nav('em-done');
+document.getElementById('em-done-msg').textContent="You rode it out! That's real strength.";
+}
+
+// ===== CONTACT EX =====
+function contactExWait(){
+const entry={date:today(),time:new Date().toISOString(),type:'Contact ex',action:'waiting-24h',
+message:document.getElementById('ex-message').value,
+hoping:document.getElementById('ex-hoping').value,
+patterns:document.getElementById('ex-patterns').value};
+D.contactExLog.push(entry);
+D.urgeLog.push({date:today(),time:new Date().toISOString(),type:'Contact ex',state:'',option:'wait',outcome:'waiting'});
+save(D);
+nav('em-done');
+document.getElementById('em-done-msg').textContent="Pin set. If you still want to send in 24 hours, you can. But you probably won't.";
+}
+function showExSubstitute(){document.getElementById('ex-substitute').style.display='block'}
+function logExSubstitute(sub){
+D.urgeLog.push({date:today(),time:new Date().toISOString(),type:'Contact ex',state:'',option:'substitute',outcome:sub});
+save(D);
+if(sub.includes('evening'))nav('evening');
+else{nav('em-done');document.getElementById('em-done-msg').textContent="Good call. You're meeting the real need.";}
+}
+
+// ===== WEEKLY REVIEW =====
+let weeklyAnswers={q1:null,q2:null};
+function renderWeekly(){
+weeklyAnswers={q1:null,q2:null};
+const wl=thisWeekLogs();
+const t1=wl.filter(l=>l.tier1Morning).length;
+const t2=wl.filter(l=>l.tier2Done).length;
+document.getElementById('weekly-stats').innerHTML=
+'<div class="stat-card"><div class="num">'+t1+'/7</div><div class="label">Tier 1 Days</div></div>'+
+'<div class="stat-card"><div class="num">'+t2+'</div><div class="label">Tier 2 Actions</div></div>';
+// Chart
+renderWeeklyChart();
+// Reset button states
+['weekly-q1-yes','weekly-q1-no','weekly-q2-yes','weekly-q2-no'].forEach(id=>{
+document.getElementById(id).style.background='';document.getElementById(id).style.color='';
+});
+}
+function weeklyAnswer(q,v){
+weeklyAnswers['q'+q]=v;
+const y=document.getElementById('weekly-q'+q+'-yes');
+const n=document.getElementById('weekly-q'+q+'-no');
+if(v){y.style.background='var(--green)';y.style.color='#fff';n.style.background='';n.style.color=''}
+else{n.style.background='var(--accent)';n.style.color='#fff';y.style.background='';y.style.color=''}
+}
+function completeWeekly(){
+if(weeklyAnswers.q1===null||weeklyAnswers.q2===null)return;
+D.weeklyReviews.push({date:today(),...weeklyAnswers,learned:document.getElementById('weekly-learned').value});
+save(D);
+nav('em-done');
+document.getElementById('em-done-msg').textContent="Weekly review complete. New week, fresh start.";
+}
+function renderWeeklyChart(){
+const el=document.getElementById('weekly-chart');
+const weeks=[];
+for(let w=3;w>=0;w--){
+const start=new Date();start.setDate(start.getDate()-start.getDay()-w*7+1);
+let count=0;
+for(let d=0;d<7;d++){
+const dt=new Date(start);dt.setDate(dt.getDate()+d);
+const ds=dt.toISOString().slice(0,10);
+const log=D.dailyLogs.find(l=>l.date===ds);
+if(log&&log.tier1Morning)count++;
+}
+weeks.push(count);
+}
+el.innerHTML='<div class="chart-bar-container">'+weeks.map(c=>'<div class="chart-bar" style="height:'+Math.max(c/7*100,3)+'%"></div>').join('')+'</div>'+
+'<div class="chart-labels"><span>3w ago</span><span>2w ago</span><span>Last wk</span><span>This wk</span></div>';
+}
+
+// ===== TRACKING =====
+function renderTracking(){
+const streak=calcStreak();
+const wl=thisWeekLogs();
+const t1=wl.filter(l=>l.tier1Morning).length;
+const t2=wl.filter(l=>l.tier2Done).length;
+const track=getOrCreateToday().track||getTrack();
+document.getElementById('tracking-status').innerHTML=
+'<div class="stat-card"><div class="num">'+streak+'</div><div class="label">Day Streak</div></div>'+
+'<div class="stat-card"><div class="num">'+t1+'/7</div><div class="label">Tier 1 This Week</div></div>'+
+'<div class="stat-card"><div class="num">'+t2+'</div><div class="label">Tier 2 Actions</div></div>'+
+'<div class="stat-card"><div class="num track-badge track-'+track+'" style="font-size:1rem">'+track+'</div><div class="label">Current Track</div></div>';
+
+// Urge log
+const wu=thisWeekUrges();
+const byType={};wu.forEach(u=>{byType[u.type]=(byType[u.type]||0)+1});
+const conscious=wu.filter(u=>u.outcome==='conscious'||u.outcome==='rode-it-out').length;
+let urgeHtml='';
+Object.keys(byType).forEach(t=>{urgeHtml+='<p>'+t+': '+byType[t]+'</p>'});
+urgeHtml+='<p class="muted mt-16">Conscious choices: '+conscious+'/'+wu.length+'</p>';
+if(wu.length>0){
+const hours=wu.map(u=>new Date(u.time).getHours());
+const avg=Math.round(hours.reduce((a,b)=>a+b,0)/hours.length);
+urgeHtml+='<p class="muted">Peak time: ~'+avg+':00</p>';
+const states={};wu.forEach(u=>{if(u.state)states[u.state]=(states[u.state]||0)+1});
+const topState=Object.keys(states).sort((a,b)=>states[b]-states[a])[0];
+if(topState)urgeHtml+='<p class="muted">Primary trigger: '+topState+'</p>';
+}
+document.getElementById('tracking-urges').innerHTML=urgeHtml||'<p class="muted">No urges logged this week</p>';
+
+// Evidence bank
+const evHtml=D.evidenceBank.slice(-20).reverse().map(e=>'<div class="evidence-item">'+escHtml(e.text)+'<br><span class="muted" style="font-size:.8rem">'+e.date+'</span></div>').join('');
+document.getElementById('tracking-evidence').innerHTML=evHtml||'<p class="muted">No evidence collected yet</p>';
+document.getElementById('tracking-evidence').innerHTML+='<p class="muted mt-16">'+D.evidenceBank.length+' pieces of evidence collected</p>';
+
+// Chart
+renderWeeklyChart2();
+
+// Summary
+const allLogs=D.dailyLogs;
+const trend=t1>=5?'improving':t1>=3?'maintaining':'struggling';
+document.getElementById('tracking-summary').textContent=
+'This week you completed Tier 1 '+t1+' days, took '+t2+' forward actions'+
+(wu.length>0?', and paused before acting on urges '+conscious+' times':'')+
+'. Trend: '+trend+'.';
+
+// 30-day goals
+const last30=allLogs.filter(l=>{const d=new Date(l.date);const ago=new Date();ago.setDate(ago.getDate()-30);return d>=ago});
+const t1_30=last30.filter(l=>l.tier1Morning).length;
+const t2_30=last30.filter(l=>l.tier2Done).length;
+const em_30=last30.filter(l=>l.track==='emergency').length;
+document.getElementById('tracking-goals').innerHTML=
+'<p>Tier 1 done: '+t1_30+'/20+ days goal</p>'+
+'<div class="progress-bar"><div class="progress-bar-fill" style="width:'+Math.min(t1_30/20*100,100)+'%"></div></div>'+
+'<p>Forward actions: '+t2_30+'/12+ goal</p>'+
+'<div class="progress-bar"><div class="progress-bar-fill" style="width:'+Math.min(t2_30/12*100,100)+'%"></div></div>'+
+'<p>Evidence collected: '+D.evidenceBank.length+'</p>'+
+'<p>Emergency days (fewer is better): '+em_30+'</p>';
+}
+function renderWeeklyChart2(){
+const el=document.getElementById('tracking-chart');
+const weeks=[];
+for(let w=3;w>=0;w--){
+const start=new Date();start.setDate(start.getDate()-start.getDay()-w*7+1);
+let count=0;
+for(let d=0;d<7;d++){
+const dt=new Date(start);dt.setDate(dt.getDate()+d);
+const ds=dt.toISOString().slice(0,10);
+const log=D.dailyLogs.find(l=>l.date===ds);
+if(log&&log.tier1Morning)count++;
+}
+weeks.push(count);
+}
+el.innerHTML='<div class="chart-bar-container">'+weeks.map(c=>'<div class="chart-bar" style="height:'+Math.max(c/7*100,3)+'%"></div>').join('')+'</div>'+
+'<div class="chart-labels"><span>3w ago</span><span>2w ago</span><span>Last wk</span><span>This wk</span></div>';
+}
+
+// ===== TIMERS =====
+const timers={};
+function initTimer(name,seconds){
+if(timers[name]&&timers[name].interval)clearInterval(timers[name].interval);
+timers[name]={total:seconds,remaining:seconds,interval:null,running:false};
+renderTimer(name);
+}
+function renderTimer(name){
+const t=timers[name];if(!t)return;
+const m=Math.floor(t.remaining/60);const s=t.remaining%60;
+const el=document.getElementById(name+'-timer');
+if(el)el.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function toggleTimer(name){
+const t=timers[name];if(!t)return;
+if(t.running){
+clearInterval(t.interval);t.running=false;
+const btn=document.getElementById(name+'-timer-toggle');if(btn)btn.textContent='Resume';
+}else{
+t.running=true;
+const btn=document.getElementById(name+'-timer-toggle');if(btn)btn.textContent='Pause';
+t.interval=setInterval(()=>{
+t.remaining--;
+if(t.remaining<=0){
+clearInterval(t.interval);t.remaining=0;t.running=false;
+renderTimer(name);timerDone(name);return;
+}
+renderTimer(name);
+},1000);
+}
+}
+function resetTimer(name){
+const t=timers[name];if(!t)return;
+if(t.interval)clearInterval(t.interval);
+t.remaining=t.total;t.running=false;
+renderTimer(name);
+const btn=document.getElementById(name+'-timer-toggle');if(btn)btn.textContent='Start';
+}
+function timerDone(name){
+try{
+const ctx=new(window.AudioContext||window.webkitAudioContext)();
+for(let i=0;i<3;i++){
+const o=ctx.createOscillator();const g=ctx.createGain();
+o.connect(g);g.connect(ctx.destination);
+o.frequency.value=800;o.type='sine';
+g.gain.value=0.3;
+o.start(ctx.currentTime+i*0.3);o.stop(ctx.currentTime+i*0.3+0.2);
+}
+}catch(e){}
+const btn=document.getElementById(name+'-timer-toggle');if(btn)btn.textContent='Done';
+// Show after-sections
+if(name==='urgeA')document.getElementById('urgeA-after').style.display='block';
+if(name==='urgeB')document.getElementById('urgeB-after').style.display='block';
+if(name==='frozen')document.getElementById('frozen-done-msg').style.display='block';
+}
+
+// ===== UTILITIES =====
+function renderStepDots(containerId,total,activeIdx){
+const c=document.getElementById(containerId);
+c.innerHTML='';
+for(let i=0;i<total;i++){
+const d=document.createElement('div');
+d.className='step-dot'+(i<activeIdx?' done':i===activeIdx?' active':'');
+c.appendChild(d);
+}
+}
+function updateWordCount(textareaId,countId){
+const words=document.getElementById(textareaId).value.trim().split(/\s+/).filter(w=>w).length;
+document.getElementById(countId).textContent=words+' words (aim for ~500)';
+}
+function escHtml(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+
+// ===== INIT =====
+initTimer('morningMed',10*60);
+initTimer('frozen',5*60);
+renderDashboard();
+</script>
+</body>
+</html>
