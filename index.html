@@ -1,1067 +1,1535 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>MindHelp</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempo</title>
+<meta name="description" content="Tempo — a boutique marketing agency.">
+
+<!-- ============================================================================
+     EXTERNAL LIBRARIES (loaded from CDNs, all free for commercial use)
+     - GSAP            : animation engine
+     - ScrollTrigger   : GSAP plugin for scroll-driven animations
+     - Lenis           : smooth scrolling
+     - SplitType       : splits text into chars/words for staggered reveals
+============================================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+<script src="https://unpkg.com/split-type@0.3.4/umd/index.min.js"></script>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
---bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--accent2:#f5a623;
---green:#27ae60;--text:#eee;--muted:#999;--radius:12px;--shadow:0 2px 12px rgba(0,0,0,.3);
+/* ============================================================================
+   1. DESIGN TOKENS
+   Edit brand colours, fonts, spacing here and they propagate everywhere.
+============================================================================ */
+:root {
+  --c-primary:    #FF2336;
+  --c-secondary:  #0E042D;
+  --c-mint:       #9CFFB8;
+  --c-yellow:     #FFFF83;
+  --c-white:      #FFFFFF;
+  --c-grey:       #F4F4F4;
+  --c-grey-mid:   #E2E0E6;
+  --c-text-mute:  #6B6675;
+
+  --font-serif:   Georgia, "Times New Roman", serif;
+  --font-sans:    "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --gutter:       clamp(1.25rem, 3vw, 2.5rem);
+  --section-pad:  clamp(4rem, 10vw, 8rem);
+  --max-width:    1440px;
+
+  --ease-out:     cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast:       0.25s;
+  --t-mid:        0.6s;
 }
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-background:var(--bg);color:var(--text);font-size:16px;line-height:1.5;overflow-x:hidden}
-button{font-family:inherit;font-size:1rem;border:none;border-radius:var(--radius);
-padding:14px 20px;cursor:pointer;transition:all .2s;min-height:48px;min-width:48px;
-font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-button:active{transform:scale(.96)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:#d63050}
-.btn-secondary{background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,.1)}
-.btn-secondary:hover{background:#1a4a80}
-.btn-green{background:var(--green);color:#fff}
-.btn-green:hover{background:#219150}
-.btn-orange{background:var(--accent2);color:#111}
-.btn-orange:hover{background:#e09510}
-.btn-danger{background:#c0392b;color:#fff}
-.btn-danger:hover{background:#a93226}
-.btn-full{width:100%}
-.btn-lg{padding:18px 24px;font-size:1.1rem}
-textarea,input[type="text"]{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
-border-radius:var(--radius);padding:14px;color:var(--text);font-size:1rem;font-family:inherit;
-resize:vertical;min-height:100px;line-height:1.5}
-textarea:focus,input[type="text"]:focus{outline:none;border-color:var(--accent)}
-input[type="text"]{min-height:auto}
-.card{background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:16px;
-box-shadow:var(--shadow)}
-.page{display:none;padding:16px 16px 100px;max-width:600px;margin:0 auto;animation:fadeIn .3s}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-h1{font-size:1.5rem;margin-bottom:8px}
-h2{font-size:1.2rem;margin-bottom:12px;color:var(--muted)}
-h3{font-size:1.05rem;margin-bottom:8px}
-.streak-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green);
-color:#fff;padding:6px 14px;border-radius:20px;font-weight:700;font-size:.95rem}
-.track-badge{display:inline-block;padding:6px 14px;border-radius:20px;font-weight:700;font-size:.85rem}
-.track-momentum{background:var(--green);color:#fff}
-.track-reset{background:var(--accent2);color:#111}
-.track-emergency{background:var(--accent);color:#fff}
-.nav-bottom{position:fixed;bottom:0;left:0;right:0;background:var(--surface);
-border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:center;gap:8px;
-padding:10px 12px;z-index:100;padding-bottom:max(10px,env(safe-area-inset-bottom))}
-.nav-bottom button{flex:1;max-width:140px;padding:10px 8px;font-size:.8rem;border-radius:10px}
-.checkbox-row{display:flex;align-items:center;gap:12px;padding:12px 0;cursor:pointer;
-font-size:1rem;user-select:none}
-.checkbox-row input[type="checkbox"]{width:24px;height:24px;accent-color:var(--green);cursor:pointer}
-.radio-row{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;
-background:rgba(255,255,255,.05);border-radius:var(--radius);margin-bottom:8px;user-select:none}
-.radio-row:hover{background:rgba(255,255,255,.1)}
-.radio-row input[type="radio"]{width:20px;height:20px;accent-color:var(--accent);cursor:pointer}
-.timer-display{font-size:3rem;font-weight:700;text-align:center;padding:24px 0;
-font-variant-numeric:tabular-nums}
-.timer-controls{display:flex;gap:12px;justify-content:center}
-.progress-bar{height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin:12px 0}
-.progress-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}
-.mantra{background:rgba(233,69,96,.1);border-left:4px solid var(--accent);padding:16px;
-border-radius:0 var(--radius) var(--radius) 0;margin:16px 0;font-style:italic;line-height:1.6}
-.encouragement{text-align:center;padding:20px;font-size:1.1rem;color:var(--green)}
-.step-indicator{display:flex;gap:8px;margin-bottom:20px}
-.step-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2)}
-.step-dot.active{background:var(--accent)}
-.step-dot.done{background:var(--green)}
-.spacer{height:16px}
-.muted{color:var(--muted)}
-.text-center{text-align:center}
-.mb-8{margin-bottom:8px}
-.mb-16{margin-bottom:16px}
-.mb-24{margin-bottom:24px}
-.mt-16{margin-top:16px}
-.flex-col{display:flex;flex-direction:column;gap:12px}
-.flex-row{display:flex;gap:12px;flex-wrap:wrap}
-.word-count{text-align:right;color:var(--muted);font-size:.85rem;margin-top:4px}
-.rating-row{display:flex;gap:8px;justify-content:center}
-.rating-btn{width:48px;height:48px;border-radius:50%;background:var(--card);color:var(--text);
-font-size:1.2rem;padding:0;border:2px solid transparent}
-.rating-btn.selected{border-color:var(--accent);background:var(--accent)}
-.chart-bar-container{display:flex;align-items:flex-end;gap:4px;height:120px;padding:8px 0}
-.chart-bar{flex:1;background:var(--green);border-radius:4px 4px 0 0;min-height:2px;transition:height .3s}
-.chart-labels{display:flex;gap:4px;font-size:.7rem;color:var(--muted)}
-.chart-labels span{flex:1;text-align:center}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.stat-card{background:var(--card);border-radius:var(--radius);padding:16px;text-align:center}
-.stat-card .num{font-size:2rem;font-weight:700}
-.stat-card .label{font-size:.8rem;color:var(--muted);margin-top:4px}
-.evidence-item{padding:10px 14px;background:rgba(39,174,96,.1);border-radius:var(--radius);
-margin-bottom:8px;font-size:.95rem;border-left:3px solid var(--green)}
-.breadcrumb{font-size:.85rem;color:var(--muted);margin-bottom:16px}
-.breadcrumb a{color:var(--accent);text-decoration:none;cursor:pointer}
-audio{display:none}
+
+/* ============================================================================
+   2. RESET & BASE
+============================================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--c-white);
+  color: var(--c-secondary);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 0;
+}
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+ul { list-style: none; padding: 0; margin: 0; }
+img { max-width: 100%; display: block; }
+
+/* Lenis smooth-scroll helpers (required by the library) */
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Hide native scrollbar (page is still scrollable) */
+body::-webkit-scrollbar { display: none; }
+body { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Custom cursor only when JS confirms it's safe (otherwise default cursor stays) */
+body.cursor-on,
+body.cursor-on a,
+body.cursor-on button { cursor: none; }
+
+/* Pre-reveal hide ONLY applies when .js class is set (after libraries load).
+   If JS or a library fails, text stays visible — no broken-looking page. */
+html.js [data-split] { opacity: 0; }
+html.js [data-fade]  { opacity: 0; transform: translateY(20px); }
+
+/* ============================================================================
+   3. CUSTOM CURSOR (small dot following the mouse, scales on hover)
+============================================================================ */
+.cursor {
+  position: fixed; top: 0; left: 0;
+  width: 12px; height: 12px;
+  background: var(--c-secondary);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  transition: width var(--t-fast) var(--ease-out),
+              height var(--t-fast) var(--ease-out);
+  transform: translate3d(-100px, -100px, 0);
+}
+.cursor.is-hover { width: 44px; height: 44px; }
+
+/* ============================================================================
+   4. UTILITIES (eyebrow label, buttons, container)
+============================================================================ */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--c-text-mute);
+  margin-bottom: 1.25rem;
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.95rem 1.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--c-secondary);
+  background: transparent;
+  color: var(--c-secondary);
+  font-size: 0.95rem;
+  transition: background var(--t-fast), color var(--t-fast),
+              border-color var(--t-fast), transform var(--t-fast);
+}
+.btn:hover { background: var(--c-secondary); color: var(--c-white); transform: translateY(-2px); }
+.btn--primary { background: var(--c-secondary); color: var(--c-white); }
+.btn--primary:hover { background: var(--c-primary); border-color: var(--c-primary); color: var(--c-white); }
+.btn--ghost { border-color: var(--c-grey-mid); color: var(--c-secondary); }
+.btn--ghost:hover { background: var(--c-grey); color: var(--c-secondary); }
+.btn--light { background: var(--c-white); color: var(--c-secondary); border-color: transparent; }
+.btn--light:hover { background: var(--c-secondary); color: var(--c-white); }
+
+/* ============================================================================
+   5. NAVIGATION (fixed top bar, mix-blend-mode for legibility on any bg)
+============================================================================ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem var(--gutter);
+  mix-blend-mode: difference;
+  color: var(--c-white);
+}
+.nav__logo { font-family: var(--font-serif); font-size: 1.4rem; letter-spacing: -0.02em; }
+.nav__cta {
+  font-size: 0.85rem; padding: 0.55rem 1.1rem;
+  border: 1px solid currentColor; border-radius: 999px;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.nav__cta:hover { background: var(--c-white); color: var(--c-secondary); mix-blend-mode: normal; }
+
+
+/* ============================================================================
+   6. HERO CAROUSEL — Sugar-style layout
+============================================================================ */
+.hero {
+  position: relative;
+  height: 100svh;
+  min-height: 640px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero__bg-stack {
+  position: absolute; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.hero__bg {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s var(--ease-out);
+}
+.hero__bg.is-active { opacity: 1; }
+.hero__bg.bg--white  { background: var(--c-white); }
+.hero__bg.bg--red    { background: var(--c-primary); }
+.hero__bg.bg--mint   { background: var(--c-mint); }
+.hero__bg.bg--yellow { background: var(--c-yellow); }
+.hero__bg.bg--navy   { background: var(--c-secondary); }
+
+.hero__bg-fade {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    to top,
+    var(--c-white) 0%,
+    rgba(255,255,255,0.85) 25%,
+    rgba(255,255,255,0.4) 55%,
+    rgba(255,255,255,0) 100%
+  );
+
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero__wordmark {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-serif);
+  font-size: clamp(8rem, 22vw, 22rem);
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+  color: rgba(14, 4, 45, 0.12);
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  mix-blend-mode: multiply;
+  transition: color 0.8s var(--ease-out);
+}
+.hero[data-theme="dark"] .hero__wordmark { color: rgba(255,255,255,0.12); mix-blend-mode: screen; }
+
+.hero-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+.hero-track {
+  position: relative;
+  width: 100%; height: 100%;
+  transition: none;
+  will-change: transform;
+  cursor: grab;
+  touch-action: pan-y;
+}
+.hero-track:active { cursor: grabbing; }
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem var(--gutter) 9rem;
+}
+
+.slide:not(.is-active) .slide__title,
+.slide:not(.is-active) .slide__copy,
+.slide:not(.is-active) .slide__shape {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.slide.is-active .slide__title,
+.slide.is-active .slide__copy,
+.slide.is-active .slide__shape {
+  opacity: 1;
+  visibility: visible;
+}
+.slide__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2rem;
+  max-width: 720px;
+  width: 100%;
+  z-index: 2;
+}
+
+.slide__card {
+  width: clamp(280px, 38vw, 460px);
+  aspect-ratio: 4 / 5;
+  border-radius: 24px;
+  background: var(--c-secondary);
+  box-shadow: 0 30px 80px -30px rgba(14, 4, 45, 0.45);
+  transform-origin: center;
+  will-change: transform;
+  z-index: 3;
+  backface-visibility: hidden;
+}
+.slide__card.is-red    { background: var(--c-primary); }
+.slide__card.is-mint   { background: var(--c-mint); }
+.slide__card.is-yellow { background: var(--c-yellow); }
+.slide__card.is-navy   { background: var(--c-secondary); }
+.slide__card.is-white  { background: var(--c-white); border: 1px solid var(--c-grey-mid); }
+	.hero.hero--loading .slide:not(.is-active) .slide__card {
+  opacity: 0 !important;
+}
+
+.slide__shape {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  border: 1px dashed rgba(14, 4, 45, 0.35);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(14, 4, 45, 0.55);
+  backdrop-filter: blur(4px);
+}
+.slide__shape.shape--1 {
+  width: 120px;
+  height: 120px;
+  top: 16%;
+  left: 12%;
+}
+
+.slide__shape.shape--2 {
+  width: 150px;
+  height: 110px;
+  bottom: 24%;
+  right: 10%;
+  transform: rotate(10deg);
+}
+
+.slide__shape.shape--3 {
+  width: 90px;
+  height: 90px;
+  top: 18%;
+  right: 20%;
+  transform: rotate(-8deg);
+}
+
+.slide__title {
+  font-size: clamp(2rem, 4.5vw, 4rem);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  max-width: 18ch;
+}
+.slide__copy {
+  max-width: 44ch;
+  font-size: 1rem;
+  color: var(--c-text-mute);
+}
+.slide.theme-dark .slide__title { color: var(--c-white); }
+.slide.theme-dark .slide__copy  { color: rgba(255,255,255,0.78); }
+
+.hero-nav {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 1.25rem;
+  z-index: 5;
+}
+.arrow-btn {
+  width: 48px; height: 48px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--c-secondary);
+  border-radius: 50%;
+  color: var(--c-secondary);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(6px);
+  font-size: 1.1rem;
+  transition: background var(--t-fast), color var(--t-fast), opacity var(--t-fast);
+}
+.arrow-btn:hover { background: var(--c-secondary); color: var(--c-white); }
+.arrow-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.progress-bars { display: flex; gap: 0.5rem; }
+.progress-bar {
+  width: 36px; height: 3px;
+  background: rgba(14, 4, 45, 0.25);
+  border-radius: 999px;
+  transition: width var(--t-fast), background var(--t-fast);
+}
+.progress-bar.is-active { background: var(--c-secondary); width: 64px; }
+
+.hero[data-theme="dark"] .arrow-btn { color: var(--c-white); border-color: var(--c-white); background: rgba(255,255,255,0.12); }
+.hero[data-theme="dark"] .arrow-btn:hover { background: var(--c-white); color: var(--c-secondary); }
+.hero[data-theme="dark"] .progress-bar { background: rgba(255,255,255,0.3); }
+.hero[data-theme="dark"] .progress-bar.is-active { background: var(--c-white); }
+
+
+/* ============================================================================
+   7. INTRO STATEMENT
+============================================================================ */
+.intro { padding: var(--section-pad) var(--gutter); }
+.intro__inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  transform-origin: center top;
+}
+.intro__title {
+  font-size: clamp(2.4rem, 5.5vw, 5.5rem);
+  max-width: 22ch;
+  margin-bottom: 2rem;
+}
+.intro__body {
+  max-width: 56ch; font-size: 1.1rem; color: var(--c-text-mute);
+  margin-bottom: 2.5rem;
+}
+
+
+/* ============================================================================
+   8. CASES — STACKED STICKY CARDS (clou.ch-style)
+============================================================================ */
+.cases { padding: 0 var(--gutter) var(--section-pad); }
+.cases__head { max-width: var(--max-width); margin: 0 auto var(--section-pad); }
+.cases__title { font-size: clamp(2rem, 4vw, 3.5rem); max-width: 28ch; }
+.cases__list { max-width: var(--max-width); margin: 0 auto; }
+
+.case-card {
+  position: sticky;
+  top: 4rem;
+  margin-bottom: 1.5rem;
+  border-radius: 24px;
+  overflow: hidden;
+  color: var(--c-white);
+  box-shadow: 0 -10px 40px -20px rgba(0,0,0,0.25);
+}
+.case-card.is-red      { background: var(--c-primary);   color: var(--c-white); }
+.case-card.is-mint     { background: var(--c-mint);      color: var(--c-secondary); }
+.case-card.is-yellow   { background: var(--c-yellow);    color: var(--c-secondary); }
+.case-card.is-navy     { background: var(--c-secondary); color: var(--c-white); }
+.case-card.is-bordered { background: var(--c-white); border: 1px solid var(--c-grey-mid); color: var(--c-secondary); box-shadow: none; }
+
+.case-card__inner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+  padding: 3rem; min-height: 60vh; align-items: center;
+}
+.case-card__header { display: flex; flex-direction: column; justify-content: space-between; gap: 2.5rem; height: 100%; padding: 1rem 0; }
+.case-card__title { font-size: clamp(1.8rem, 4vw, 3.5rem); line-height: 1.05; max-width: 18ch; }
+.case-card__tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.case-card__tags li {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em;
+  padding: 0.4rem 0.9rem; border: 1px solid currentColor; border-radius: 999px;
+  opacity: 0.85;
+}
+.case-card__media { background: rgba(255,255,255,0.18); border-radius: 16px; aspect-ratio: 4 / 3; }
+.case-card.is-mint .case-card__media,
+.case-card.is-yellow .case-card__media,
+.case-card.is-bordered .case-card__media { background: rgba(0,0,0,0.08); }
+.case-card.is-bordered .case-card__media { display: none; }
+.case-card.is-bordered .case-card__inner { grid-template-columns: 1fr; }
+
+/* ============================================================================
+   9. ABOUT / WHY US (two-column: text + image placeholder)
+============================================================================ */
+.about { padding: var(--section-pad) var(--gutter); }
+.about__inner {
+  max-width: var(--max-width); margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+}
+.about__title { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 1.5rem; max-width: 16ch; }
+.about__body { color: var(--c-text-mute); margin-bottom: 2rem; max-width: 44ch; }
+.about__image { width: 100%; aspect-ratio: 4 / 3; background: var(--c-grey); border-radius: 24px; }
+
+
+/* ============================================================================
+   10. JOURNAL CAROUSEL (drag or arrow nav, ~4 cards visible on desktop)
+============================================================================ */
+.journal { padding: var(--section-pad) 0; background: var(--c-grey); }
+.journal__head {
+  max-width: var(--max-width); margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: flex; justify-content: space-between; align-items: end;
+  gap: 2rem; flex-wrap: wrap; margin-bottom: 3rem;
+}
+.journal__title { font-size: clamp(2rem, 4vw, 3.5rem); max-width: 18ch; }
+.journal__nav { display: flex; gap: 0.5rem; }
+.journal__viewport { overflow: hidden; padding-left: var(--gutter); }
+.journal__track {
+  display: flex; gap: 1rem;
+  transition: transform 0.6s var(--ease-out);
+  will-change: transform; cursor: grab;
+}
+.journal__track:active { cursor: grabbing; }
+
+.article-card { flex: 0 0 280px; user-select: none; }
+.article-card__image {
+  aspect-ratio: 4 / 5; background: var(--c-white); border-radius: 16px;
+  margin-bottom: 1rem; transition: transform var(--t-fast);
+}
+.article-card:hover .article-card__image { transform: scale(0.985); }
+.article-card__tag {
+  display: inline-block; font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.14em; padding: 0.3rem 0.8rem;
+  background: var(--c-white); border-radius: 999px; margin-bottom: 0.8rem;
+}
+.article-card__title { font-family: var(--font-serif); font-size: 1.3rem; line-height: 1.15; margin-bottom: 0.5rem; }
+.article-card__copy { font-size: 0.92rem; color: var(--c-text-mute); line-height: 1.55; }
+
+
+/* ============================================================================
+   11. CTA — Sticky call-to-action panel
+============================================================================ */
+.cta { padding: var(--section-pad) var(--gutter); min-height: 100vh; }
+.cta__inner { max-width: var(--max-width); margin: 0 auto; }
+.cta__sticky { position: sticky; top: 28vh; max-width: 36rem; }
+.cta__title { font-size: clamp(2rem, 4vw, 3.5rem); margin-bottom: 2rem; }
+.cta__buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+
+/* ============================================================================
+   12. FOOTER
+============================================================================ */
+.footer { padding: var(--section-pad) var(--gutter) 2rem; background: var(--c-secondary); color: var(--c-white); }
+.footer__inner { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; }
+.footer__wordmark { font-family: var(--font-serif); font-size: clamp(3rem, 8vw, 6rem); line-height: 1; margin-bottom: 1rem; }
+.footer__tagline { max-width: 36ch; color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+.footer__col h4 { font-family: var(--font-sans); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.18em; margin-bottom: 1rem; color: rgba(255,255,255,0.55); }
+.footer__col p, .footer__col a { font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.85); display: block; }
+.footer__col a:hover { color: var(--c-primary); }
+.footer__base { max-width: var(--max-width); margin: 4rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+
+
+/* ============================================================================
+   13. RESPONSIVE
+============================================================================ */
+@media (max-width: 820px) {
+  .nav__cta { display: none; }
+  .slide__card { width: clamp(220px, 60vw, 340px); }
+  .slide__shape.shape--1 { width: 56px; height: 56px; top: 14%; left: 6%; }
+  .slide__shape.shape--2 { width: 80px; height: 80px; bottom: 22%; right: 6%; }
+  .slide__shape.shape--3 { width: 44px; height: 44px; top: 8%; right: 12%; }
+  .case-card__inner { grid-template-columns: 1fr; padding: 2rem; min-height: auto; }
+  .about__inner { grid-template-columns: 1fr; }
+  .footer__inner { grid-template-columns: 1fr; }
+  .article-card { flex: 0 0 240px; }
+}
+
+@media (hover: none) {
+  body.cursor-on, body.cursor-on a, body.cursor-on button { cursor: auto; }
+  .cursor { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 </head>
 <body>
 
-<!-- ===== PAGES ===== -->
+<div class="cursor" id="cursor"></div>
 
-<!-- DASHBOARD -->
-<div id="pg-dashboard" class="page active">
-<div class="card text-center">
-<div class="muted mb-8" id="dash-date"></div>
-<h1>MindHelp</h1>
-<div class="spacer"></div>
-<div class="streak-badge" id="dash-streak">0 day streak</div>
-<div class="spacer"></div>
-<div id="dash-track-badge"></div>
-</div>
-<div class="card" id="dash-route-info"></div>
-<div class="flex-col" id="dash-nav-buttons"></div>
-<div class="spacer"></div>
-<div class="card">
-<h3>Today's Progress</h3>
-<div id="dash-today-status"></div>
-</div>
-</div>
+<nav class="nav">
+  <a class="nav__logo" href="#">Tempo</a>
+  <a class="nav__cta" href="#cta">Get in touch</a>
+</nav>
 
-<!-- MORNING TIER 1 -->
-<div id="pg-morning" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Morning Check-In</div>
-<div class="step-indicator" id="morning-steps"></div>
+<header class="hero hero--loading" id="hero" data-theme="light">
+  <div class="hero__bg-stack">
+    <div class="hero__bg bg--red    is-active" data-bg-index="0"></div>
+    <div class="hero__bg bg--mint              " data-bg-index="1"></div>
+    <div class="hero__bg bg--yellow            " data-bg-index="2"></div>
+    <div class="hero__bg bg--navy              " data-bg-index="3"></div>
+    <div class="hero__bg-fade" id="hero-bg-fade"></div>
+  </div>
 
-<div id="morning-step-1" class="card">
-<h2>Step 1: Blood Sugar Management</h2>
-<label class="checkbox-row"><input type="checkbox" id="morning-bs" onchange="morningCheck()"> Blood sugar checked and managed</label>
-<button class="btn-primary btn-full mt-16" id="morning-bs-next" disabled onclick="morningGoStep(2)">Next</button>
-</div>
+  <div class="hero__wordmark" aria-hidden="true">TEMPO</div>
 
-<div id="morning-step-2" class="card" style="display:none">
-<h2>Step 2: Meditation / Visualization (10 min)</h2>
-<p class="mantra">See yourself as the person who's already solved these problems. What does that version of you do today? How does he feel in his body?</p>
-<div class="timer-display" id="morning-med-timer">10:00</div>
-<div class="timer-controls">
-<button class="btn-secondary" id="morning-med-toggle" onclick="toggleTimer('morningMed')">Start</button>
-<button class="btn-secondary" onclick="resetTimer('morningMed')">Reset</button>
-</div>
-<textarea id="morning-med-notes" placeholder="Optional notes..." class="mt-16" rows="3"></textarea>
-<button class="btn-primary btn-full mt-16" onclick="morningGoStep(3)">Complete</button>
-</div>
+  <div class="hero-stage">
+    <div class="hero-track" id="hero-track">
 
-<div id="morning-step-3" class="card" style="display:none">
-<h2>Step 3: Freewriting (One page)</h2>
-<p class="muted mb-8">Dump the worry thoughts here</p>
-<textarea id="morning-freewrite" placeholder="Write freely..." rows="8" oninput="updateWordCount('morning-freewrite','morning-wc')"></textarea>
-<div class="word-count" id="morning-wc">0 words (aim for ~500)</div>
-<button class="btn-green btn-full btn-lg mt-16" onclick="completeMorning()">Done Writing - Complete Morning</button>
-</div>
+      <article class="slide theme-dark" data-slide-index="0" data-theme="dark">
+        <div class="slide__shape shape--1" style="background: var(--c-mint);"></div>
+        <div class="slide__shape shape--2" style="background: var(--c-yellow);"></div>
+        <div class="slide__shape shape--3" style="background: var(--c-secondary);"></div>
+        <div class="slide__inner">
+          <div class="slide__card is-white"></div>
+          <h1 class="slide__title" data-split>Lorem ipsum dolor sit amet consectetur.</h1>
+          <p class="slide__copy">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          </p>
+        </div>
+      </article>
 
-<div id="morning-complete" class="card" style="display:none">
-<div class="encouragement">Tier 1 Morning Complete &#10003;</div>
-<p class="text-center muted mb-16">Your streak has been updated.</p>
-<button class="btn-primary btn-full" onclick="nav('tier2')">Pick a Tier 2 Action</button>
-<div class="spacer"></div>
-<button class="btn-secondary btn-full" onclick="nav('dashboard')">Done for Now</button>
-</div>
-</div>
+      <article class="slide" data-slide-index="1" data-theme="light">
+        <div class="slide__shape shape--1" style="background: var(--c-primary);"></div>
+        <div class="slide__shape shape--2" style="background: var(--c-yellow);"></div>
+        <div class="slide__shape shape--3" style="background: var(--c-secondary);"></div>
+        <div class="slide__inner">
+          <div class="slide__card is-navy"></div>
+          <h1 class="slide__title" data-split>Ut enim ad minim veniam quis nostrud.</h1>
+          <p class="slide__copy">
+            Duis aute irure dolor in reprehenderit in voluptate velit esse
+            cillum dolore eu fugiat nulla pariatur.
+          </p>
+        </div>
+      </article>
 
-<!-- TIER 2 -->
-<div id="pg-tier2" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Tier 2: Daily Action</div>
-<div class="card">
-<h2>Pick ONE action today</h2>
-<p class="muted mb-16" id="tier2-day-label"></p>
-<div id="tier2-options"></div>
-</div>
-<div id="tier2-activity" class="card" style="display:none">
-<h3 id="tier2-selected-label"></h3>
-<div class="timer-display" id="tier2-timer">30:00</div>
-<div class="timer-controls mb-16">
-<button class="btn-secondary" id="tier2-timer-toggle" onclick="toggleTimer('tier2')">Start</button>
-<button class="btn-secondary" onclick="resetTimer('tier2')">Reset</button>
-</div>
-<textarea id="tier2-notes" placeholder="What did you do?" rows="4"></textarea>
-<button class="btn-green btn-full btn-lg mt-16" onclick="completeTier2()">Log Completion</button>
-</div>
-<div id="tier2-done" class="card" style="display:none">
-<div class="encouragement" id="tier2-done-msg"></div>
-<button class="btn-primary btn-full" onclick="nav('dashboard')">Back to Dashboard</button>
-</div>
-</div>
+      <article class="slide" data-slide-index="2" data-theme="light">
+        <div class="slide__shape shape--1" style="background: var(--c-mint);"></div>
+        <div class="slide__shape shape--2" style="background: var(--c-secondary); border-radius: 50%; transform: rotate(0);"></div>
+        <div class="slide__shape shape--3" style="background: var(--c-primary);"></div>
+        <div class="slide__inner">
+          <div class="slide__card is-red"></div>
+          <h1 class="slide__title" data-split>Excepteur sint occaecat cupidatat non.</h1>
+          <p class="slide__copy">
+            Sunt in culpa qui officia deserunt mollit anim id est laborum.
+            Sed ut perspiciatis unde omnis iste natus error.
+          </p>
+        </div>
+      </article>
 
-<!-- EVENING PROTOCOL -->
-<div id="pg-evening" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Evening Protocol</div>
-<div class="step-indicator" id="evening-steps"></div>
+      <article class="slide theme-dark" data-slide-index="3" data-theme="dark">
+        <div class="slide__shape shape--1" style="background: var(--c-mint);"></div>
+        <div class="slide__shape shape--2" style="background: var(--c-yellow);"></div>
+        <div class="slide__shape shape--3" style="background: var(--c-primary);"></div>
+        <div class="slide__inner">
+          <div class="slide__card" style="background: purple;"></div>
+          <h1 class="slide__title" data-split>Nemo enim ipsam voluptatem quia voluptas.</h1>
+          <p class="slide__copy">
+            At vero eos et accusamus et iusto odio dignissimos ducimus qui
+            blanditiis praesentium voluptatum.
+          </p>
+        </div>
+      </article>
 
-<div id="evening-step-1" class="card">
-<h2>Step 1: Evidence Collection</h2>
-<p class="muted mb-8">What's one thing you actually did today? (Even tiny)</p>
-<textarea id="evening-evidence" placeholder="I..." rows="3"></textarea>
-<button class="btn-primary btn-full mt-16" onclick="eveningGoStep(2)">Next</button>
-</div>
+    </div>
+  </div>
 
-<div id="evening-step-2" class="card" style="display:none">
-<h2>Step 2: Thought Pattern Check</h2>
-<textarea id="evening-thought" placeholder="What thought kept running today? Or what thought did you catch before it spiraled?" rows="4"></textarea>
-<button class="btn-primary btn-full mt-16" onclick="eveningGoStep(3)">Next</button>
-</div>
+  <div class="hero-nav">
+    <button class="arrow-btn" id="hero-prev" aria-label="Previous slide">←</button>
+    <div class="progress-bars" id="progress-bars">
+      <button class="progress-bar is-active" data-target-slide="0" aria-label="Go to slide 1"></button>
+      <button class="progress-bar"           data-target-slide="1" aria-label="Go to slide 2"></button>
+      <button class="progress-bar"           data-target-slide="2" aria-label="Go to slide 3"></button>
+      <button class="progress-bar"           data-target-slide="3" aria-label="Go to slide 4"></button>
+    </div>
+    <button class="arrow-btn" id="hero-next" aria-label="Next slide">→</button>
+  </div>
+</header>
 
-<div id="evening-step-3" class="card" style="display:none">
-<h2>Step 3: Tomorrow Setup</h2>
-<textarea id="evening-tomorrow" placeholder="Tomorrow's ONE thing:" rows="3"></textarea>
-<button class="btn-primary btn-full mt-16" onclick="eveningGoStep(4)">Next</button>
-</div>
+<section class="intro" id="intro">
+  <div class="intro__inner">
+    <p class="eyebrow">Lorem</p>
+    <h2 class="intro__title" data-split>
+      Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor.
+    </h2>
+    <p class="intro__body">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua.
+    </p>
+    <a class="btn btn--primary" href="#cta">Lorem ipsum →</a>
+  </div>
+</section>
 
-<div id="evening-step-4" class="card" style="display:none">
-<h2>Step 4: Urge Check</h2>
-<p class="mb-16">Feeling urge-y right now?</p>
-<div class="flex-row">
-<button class="btn-orange" style="flex:1" onclick="nav('urge');eveningGoStep(5)">Yes</button>
-<button class="btn-secondary" style="flex:1" onclick="eveningGoStep(5)">No</button>
-</div>
-</div>
+<section class="cases" id="cases">
+  <div class="cases__head">
+    <p class="eyebrow">Lorem</p>
+    <h2 class="cases__title" data-split>
+      Lorem ipsum dolor sit amet consectetur adipiscing elit.
+    </h2>
+  </div>
 
-<div id="evening-step-5" class="card" style="display:none">
-<h2>Step 5: Evening Activity</h2>
-<div id="evening-activity-content"></div>
-</div>
+  <div class="cases__list">
+    <article class="case-card is-red">
+      <div class="case-card__inner">
+        <header class="case-card__header">
+          <h3 class="case-card__title">Lorem ipsum dolor sit amet</h3>
+          <ul class="case-card__tags"><li>Lorem</li><li>Ipsum</li><li>Dolor</li><li>Amet</li></ul>
+        </header>
+        <div class="case-card__media"></div>
+      </div>
+    </article>
 
-<div id="evening-bs" class="card" style="display:none">
-<h2>Evening Blood Sugar</h2>
-<label class="checkbox-row"><input type="checkbox" id="evening-bs-check" onchange="eveningBsCheck()"> Evening blood sugar managed</label>
-</div>
+    <article class="case-card is-mint">
+      <div class="case-card__inner">
+        <header class="case-card__header">
+          <h3 class="case-card__title">Consectetur adipiscing elit</h3>
+          <ul class="case-card__tags"><li>Sed</li><li>Eiusmod</li><li>Tempor</li><li>Labore</li></ul>
+        </header>
+        <div class="case-card__media"></div>
+      </div>
+    </article>
 
-<div id="evening-reflect" class="card" style="display:none">
-<h2>5-Min Reflection</h2>
-<p class="muted mb-8">What's one piece of evidence today that you're capable? (Even tiny things count)</p>
-<textarea id="evening-reflect-text" rows="3"></textarea>
-<button class="btn-green btn-full btn-lg mt-16" onclick="completeEvening()">Complete Evening Protocol</button>
-</div>
+    <article class="case-card is-yellow">
+      <div class="case-card__inner">
+        <header class="case-card__header">
+          <h3 class="case-card__title">Magna aliqua ut enim ad</h3>
+          <ul class="case-card__tags"><li>Veniam</li><li>Nostrud</li><li>Ullamco</li><li>Laboris</li></ul>
+        </header>
+        <div class="case-card__media"></div>
+      </div>
+    </article>
 
-<div id="evening-complete" class="card" style="display:none">
-<div class="encouragement">Evening Protocol Complete &#10003;</div>
-<p class="text-center muted mb-8">You made it through today.</p>
-<p class="text-center"><span class="streak-badge" id="evening-streak-display">0 day streak</span></p>
-<div class="spacer"></div>
-<button class="btn-primary btn-full" onclick="nav('dashboard')">Back to Dashboard</button>
-</div>
-</div>
+    <article class="case-card is-navy">
+      <div class="case-card__inner">
+        <header class="case-card__header">
+          <h3 class="case-card__title">Duis aute irure dolor in reprehenderit</h3>
+          <ul class="case-card__tags"><li>Voluptate</li><li>Cillum</li><li>Pariatur</li></ul>
+        </header>
+        <div class="case-card__media"></div>
+      </div>
+    </article>
 
-<!-- EMERGENCY -->
-<div id="pg-emergency" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Emergency</div>
-<div class="card">
-<h2>What's happening?</h2>
-<div class="flex-col">
-<button class="btn-danger btn-full btn-lg" onclick="showEmergency('financial')">Financial Worry</button>
-<button class="btn-danger btn-full btn-lg" onclick="showEmergency('relationship')">Relationship Doubt / Regret</button>
-<button class="btn-danger btn-full btn-lg" onclick="showEmergency('frozen')">Frozen / Procrastinating</button>
-<button class="btn-danger btn-full btn-lg" onclick="showEmergency('lack')">Creating from Lack Overwhelm</button>
-</div>
-</div>
-</div>
+    <article class="case-card is-bordered">
+      <div class="case-card__inner">
+        <header class="case-card__header">
+          <div>
+            <p class="eyebrow">Lorem</p>
+            <h3 class="case-card__title">Lorem ipsum dolor sit amet?</h3>
+          </div>
+          <a class="btn" href="#">View all →</a>
+        </header>
+      </div>
+    </article>
+  </div>
+</section>
+	
+<section class="about" id="about">
+  <div class="about__inner">
+    <div class="about__text">
+      <p class="eyebrow">Lorem</p>
+      <h2 class="about__title" data-split>
+        Lorem ipsum dolor sit amet consectetur adipiscing.
+      </h2>
+      <p class="about__body">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+        eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      </p>
+      <a class="btn" href="#cta">Lorem ipsum →</a>
+    </div>
+    <div class="about__image"></div>
+  </div>
+</section>
 
-<!-- EMERGENCY: FINANCIAL -->
-<div id="pg-em-financial" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('emergency')">Emergency</a> &rsaquo; Financial Worry</div>
-<div class="card">
-<div class="mantra">This feeling is information, not truth. My current situation is temporary. What's the smallest money-smart action I can take right now?</div>
-<h3 class="mb-16">Pick one action:</h3>
-<div class="flex-col">
-<button class="btn-secondary btn-full" onclick="logEmergencyAction('financial','Applied for one job')">Apply for one job</button>
-<button class="btn-secondary btn-full" onclick="logEmergencyAction('financial','Sent one email')">Send one email</button>
-<button class="btn-secondary btn-full" onclick="logEmergencyAction('financial','Saved £5')">Save £5</button>
-</div>
-<div class="spacer"></div>
-<input type="text" id="em-fin-other" placeholder="Other action...">
-<button class="btn-primary btn-full mt-16" onclick="logEmergencyAction('financial',document.getElementById('em-fin-other').value||'Other action')">I did one thing</button>
-</div>
-</div>
+<section class="journal" id="journal">
+  <div class="journal__head">
+    <h2 class="journal__title" data-split>Lorem ipsum dolor sit amet.</h2>
+    <div class="journal__nav">
+      <button class="arrow-btn" id="journal-prev" aria-label="Previous article">←</button>
+      <button class="arrow-btn" id="journal-next" aria-label="Next article">→</button>
+    </div>
+  </div>
+  <div class="journal__viewport">
+    <div class="journal__track" id="journal-track">
+      <article class="article-card">
+        <div class="article-card__image"></div>
+        <span class="article-card__tag">Lorem</span>
+        <h3 class="article-card__title">Lorem ipsum dolor sit amet</h3>
+        <p class="article-card__copy">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      </article>
+      <article class="article-card">
+        <div class="article-card__image"></div>
+        <span class="article-card__tag">Ipsum</span>
+        <h3 class="article-card__title">Sed do eiusmod tempor</h3>
+        <p class="article-card__copy">Ut labore et dolore magna aliqua, ut enim ad minim veniam.</p>
+      </article>
+      <article class="article-card">
+        <div class="article-card__image"></div>
+        <span class="article-card__tag">Dolor</span>
+        <h3 class="article-card__title">Consectetur adipiscing elit</h3>
+        <p class="article-card__copy">Quis nostrud exercitation ullamco laboris nisi ut aliquip ex.</p>
+      </article>
+      <article class="article-card">
+        <div class="article-card__image"></div>
+        <span class="article-card__tag">Amet</span>
+        <h3 class="article-card__title">Duis aute irure dolor</h3>
+        <p class="article-card__copy">Reprehenderit in voluptate velit esse cillum dolore eu fugiat.</p>
+      </article>
+      <article class="article-card">
+        <div class="article-card__image"></div>
+        <span class="article-card__tag">Lorem</span>
+        <h3 class="article-card__title">Excepteur sint occaecat</h3>
+        <p class="article-card__copy">Cupidatat non proident sunt in culpa qui officia deserunt mollit.</p>
+      </article>
+      <article class="article-card">
+        <div class="article-card__image"></div>
+        <span class="article-card__tag">Ipsum</span>
+        <h3 class="article-card__title">Anim id est laborum</h3>
+        <p class="article-card__copy">Sed ut perspiciatis unde omnis iste natus error sit voluptatem.</p>
+      </article>
+    </div>
+  </div>
+</section>
 
-<!-- EMERGENCY: RELATIONSHIP -->
-<div id="pg-em-relationship" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('emergency')">Emergency</a> &rsaquo; Relationship Doubt</div>
-<div class="card">
-<div class="mantra">I made the best decision I could with the awareness I had then. Who I was then doesn't limit who I'm becoming now.</div>
-<textarea id="em-rel-text" placeholder="What would I need to believe about myself to be ready for a relationship like that?" rows="5"></textarea>
-<button class="btn-green btn-full btn-lg mt-16" onclick="logEmergencyAction('relationship',document.getElementById('em-rel-text').value)">Complete</button>
-</div>
-</div>
+<section class="cta" id="cta">
+  <div class="cta__inner">
+    <div class="cta__sticky">
+      <p class="eyebrow">Lorem</p>
+      <h2 class="cta__title" data-split>Lorem ipsum dolor sit amet?</h2>
+      <div class="cta__buttons">
+        <a class="btn btn--primary" href="mailto:del@ontempo.agency">Send a message →</a>
+        <a class="btn btn--ghost" href="#cases">Lorem ipsum</a>
+        <a class="btn btn--ghost" href="#about">Dolor amet</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-<!-- EMERGENCY: FROZEN -->
-<div id="pg-em-frozen" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('emergency')">Emergency</a> &rsaquo; Frozen</div>
-<div class="card">
-<div class="mantra">I don't need to do this perfectly. I need to do it badly and learn. Five minutes of imperfect action beats five hours of perfect planning.</div>
-<p class="text-center muted mb-8">Do literally anything related to any goal. Stop when timer rings.</p>
-<div class="timer-display" id="frozen-timer">5:00</div>
-<div class="timer-controls">
-<button class="btn-primary" id="frozen-timer-toggle" onclick="toggleTimer('frozen')">Start</button>
-<button class="btn-secondary" onclick="resetTimer('frozen')">Reset</button>
-</div>
-<div class="spacer"></div>
-<div id="frozen-done-msg" style="display:none" class="encouragement">You'll usually keep going now. But if not, that's fine too.</div>
-<button class="btn-secondary btn-full mt-16" onclick="logEmergencyAction('frozen','Did 5 min action');nav('dashboard')">Done - Back to Dashboard</button>
-</div>
-</div>
+<footer class="footer">
+  <div class="footer__inner">
+    <div>
+      <h2 class="footer__wordmark">Tempo</h2>
+      <p class="footer__tagline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    </div>
+    <div class="footer__col">
+      <h4>Contact</h4>
+      <p>Lorem ipsum<br>Dolor sit amet<br>Consectetur</p>
+      <a href="mailto:del@ontempo.agency">del@ontempo.agency</a>
+    </div>
+    <div class="footer__col">
+      <h4>Links</h4>
+      <a href="#">Lorem ipsum</a>
+      <a href="#">Dolor amet</a>
+      <a href="#">Consectetur</a>
+    </div>
+  </div>
+  <div class="footer__base">© <span id="year"></span> Tempo. Lorem ipsum dolor sit.</div>
+</footer>
 
-<!-- EMERGENCY: LACK -->
-<div id="pg-em-lack" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('emergency')">Emergency</a> &rsaquo; Creating from Lack</div>
-<div class="card">
-<div class="mantra">I'm not creating to escape scarcity - I'm creating because I have something worth sharing. The money will follow the value, not the desperation.</div>
-<h3 class="mb-16">If money wasn't a factor, which of these projects would you still care about?</h3>
-<label class="radio-row"><input type="radio" name="lack-project" value="Job search"> Job search</label>
-<label class="radio-row"><input type="radio" name="lack-project" value="Content creation"> Content creation</label>
-<label class="radio-row"><input type="radio" name="lack-project" value="Agency"> Agency</label>
-<label class="radio-row"><input type="radio" name="lack-project" value="Other"> Other</label>
-<button class="btn-green btn-full btn-lg mt-16" onclick="logLackEmergency()">Focus There</button>
-</div>
-</div>
-
-<!-- URGE PROTOCOL -->
-<div id="pg-urge" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Urge Protocol</div>
-<div id="urge-step-1" class="card">
-<h2>Step 1: Identify</h2>
-<p class="muted mb-16">What's calling right now?</p>
-<div class="flex-col">
-<button class="btn-secondary btn-full" onclick="selectUrgeType('Junk food')">Junk food / comfort eating</button>
-<button class="btn-secondary btn-full" onclick="selectUrgeType('Porn')">Porn / self-gratification</button>
-<button class="btn-secondary btn-full" onclick="selectUrgeType('Contact ex')">Contact ex</button>
-</div>
-<div class="spacer"></div>
-<input type="text" id="urge-other" placeholder="Other...">
-<button class="btn-secondary btn-full mt-16" onclick="selectUrgeType(document.getElementById('urge-other').value||'Other')">Select Other</button>
-</div>
-
-<div id="urge-step-2" class="card" style="display:none">
-<h2>Step 2: Name the State</h2>
-<p class="muted mb-16">What are you actually feeling?</p>
-<div class="flex-col">
-<button class="btn-secondary btn-full" onclick="selectUrgeState('Lonely')">Lonely</button>
-<button class="btn-secondary btn-full" onclick="selectUrgeState('Anxious/worried')">Anxious / worried (usually money)</button>
-<button class="btn-secondary btn-full" onclick="selectUrgeState('Bored/restless')">Bored / restless</button>
-<button class="btn-secondary btn-full" onclick="selectUrgeState('Grief')">Grief surfacing</button>
-<button class="btn-secondary btn-full" onclick="selectUrgeState('Uncomfortable')">Physically uncomfortable</button>
-<button class="btn-secondary btn-full" onclick="selectUrgeState('Empty')">Just... empty</button>
-</div>
-</div>
-
-<div id="urge-step-3" class="card" style="display:none">
-<h2>Step 3: The Fork</h2>
-<div class="flex-col">
-<button class="btn-primary btn-full btn-lg" onclick="urgeFork('A')">Option A: Go ahead - make it conscious</button>
-<button class="btn-orange btn-full btn-lg" onclick="urgeFork('B')">Option B: Try something else first</button>
-<button class="btn-danger btn-full btn-lg" onclick="urgeFork('C')">Option C: Emergency mode</button>
-</div>
-</div>
-</div>
-
-<!-- URGE OPTION A -->
-<div id="pg-urge-a" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('urge')">Urge</a> &rsaquo; Option A</div>
-<div class="card">
-<h2>Make it conscious</h2>
-<p class="muted mb-8">Set a 20-minute timer. Do the thing. When timer goes off, come back here.</p>
-<div class="timer-display" id="urgeA-timer">20:00</div>
-<div class="timer-controls mb-16">
-<button class="btn-secondary" id="urgeA-timer-toggle" onclick="toggleTimer('urgeA')">Start</button>
-<button class="btn-secondary" onclick="resetTimer('urgeA')">Reset</button>
-</div>
-</div>
-<div id="urgeA-after" class="card" style="display:none">
-<h3 class="mb-8">How did that go? (1-5)</h3>
-<div class="rating-row mb-16" id="urgeA-rating"></div>
-<textarea id="urgeA-need" placeholder="What I was really needing:" rows="3"></textarea>
-<label class="checkbox-row mt-16"><input type="checkbox" id="urgeA-onemore"> Now do ONE other thing (even tiny) so this isn't the last action</label>
-<button class="btn-green btn-full btn-lg mt-16" onclick="completeUrgeA()">Log and Move On</button>
-<p class="text-center muted mt-16">No shame. You made it conscious. That matters.</p>
-</div>
-</div>
-
-<!-- URGE OPTION B -->
-<div id="pg-urge-b" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('urge')">Urge</a> &rsaquo; Option B</div>
-<div class="card">
-<h2>Try something else first</h2>
-<p class="muted mb-16">Pick a 5-minute alternative:</p>
-<div id="urgeB-alternatives" class="flex-col"></div>
-<div class="spacer"></div>
-<div class="timer-display" id="urgeB-timer">5:00</div>
-<div class="timer-controls">
-<button class="btn-secondary" id="urgeB-timer-toggle" onclick="toggleTimer('urgeB')">Start</button>
-<button class="btn-secondary" onclick="resetTimer('urgeB')">Reset</button>
-</div>
-</div>
-<div id="urgeB-after" class="card" style="display:none">
-<h3 class="mb-16">Is the urge still there?</h3>
-<div class="flex-row">
-<button class="btn-primary" style="flex:1" onclick="nav('urge-a')">Yes - Option A</button>
-<button class="btn-green" style="flex:1" onclick="completeUrgeB()">No - I rode it out!</button>
-</div>
-</div>
-</div>
-
-<!-- CONTACT EX SPECIAL -->
-<div id="pg-contact-ex" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; <a onclick="nav('urge')">Urge</a> &rsaquo; Contact Ex</div>
-<div class="card">
-<h2>THE 24-HOUR RULE</h2>
-<p class="muted mb-16">This urge is real, but you don't need to act on it right now. Let's put a pin in it.</p>
-<textarea id="ex-message" placeholder="Write the message you want to send (not sending it)" rows="4" class="mb-16"></textarea>
-<textarea id="ex-hoping" placeholder="What are you hoping will happen if you reach out?" rows="3" class="mb-16"></textarea>
-<textarea id="ex-patterns" placeholder="What will ACTUALLY happen based on past patterns?" rows="3"></textarea>
-</div>
-<div class="card">
-<h3 class="mb-16">Choose:</h3>
-<div class="flex-col">
-<button class="btn-primary btn-full btn-lg" onclick="contactExWait()">Send it tomorrow (24hr rule)</button>
-<button class="btn-orange btn-full btn-lg" onclick="showExSubstitute()">Substitute the need</button>
-<button class="btn-danger btn-full btn-lg" onclick="showEmergency('relationship')">Emergency - grief is overwhelming</button>
-</div>
-</div>
-<div id="ex-substitute" class="card" style="display:none">
-<h3 class="mb-16">What are you actually wanting?</h3>
-<div class="flex-col">
-<button class="btn-secondary btn-full" onclick="logExSubstitute('Comfort - text a friend instead')">Comfort - Text a friend instead</button>
-<button class="btn-secondary btn-full" onclick="logExSubstitute('Validation - journal it')">Validation - Journal prompt</button>
-<button class="btn-secondary btn-full" onclick="logExSubstitute('Not alone - evening protocol')">Not alone - Evening protocol</button>
-<button class="btn-secondary btn-full" onclick="logExSubstitute('Closure - unsent letter')">Closure - Unsent letter exercise</button>
-</div>
-</div>
-</div>
-
-<!-- WEEKLY REVIEW -->
-<div id="pg-weekly" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Weekly Review</div>
-<div class="card">
-<h2>Tier 3: Weekly Progress Check</h2>
-<div id="weekly-stats" class="stat-grid mb-16"></div>
-</div>
-<div class="card">
-<h3 class="mb-8">Did you do Tier 1 work at least 5 days?</h3>
-<div class="flex-row mb-16">
-<button class="btn-secondary" style="flex:1" id="weekly-q1-yes" onclick="weeklyAnswer(1,true)">Yes</button>
-<button class="btn-secondary" style="flex:1" id="weekly-q1-no" onclick="weeklyAnswer(1,false)">No</button>
-</div>
-<h3 class="mb-8">Did you complete at least 3 Tier 2 actions?</h3>
-<div class="flex-row mb-16">
-<button class="btn-secondary" style="flex:1" id="weekly-q2-yes" onclick="weeklyAnswer(2,true)">Yes</button>
-<button class="btn-secondary" style="flex:1" id="weekly-q2-no" onclick="weeklyAnswer(2,false)">No</button>
-</div>
-<textarea id="weekly-learned" placeholder="What's one thing you learned about yourself this week?" rows="4"></textarea>
-<button class="btn-green btn-full btn-lg mt-16" onclick="completeWeekly()">Complete Weekly Review</button>
-</div>
-<div class="card">
-<h3 class="mb-8">Weekly Trend</h3>
-<div id="weekly-chart"></div>
-</div>
-</div>
-
-<!-- TRACKING DASHBOARD -->
-<div id="pg-tracking" class="page">
-<div class="breadcrumb"><a onclick="nav('dashboard')">Home</a> &rsaquo; Progress</div>
-<div class="card">
-<h2>Current Status</h2>
-<div class="stat-grid" id="tracking-status"></div>
-</div>
-<div class="card">
-<h3 class="mb-8">Urge Log (This Week)</h3>
-<div id="tracking-urges"></div>
-</div>
-<div class="card">
-<h3 class="mb-8">Evidence Bank</h3>
-<div id="tracking-evidence"></div>
-</div>
-<div class="card">
-<h3 class="mb-8">Tier 1 Completion (Last 4 Weeks)</h3>
-<div id="tracking-chart"></div>
-</div>
-<div class="card">
-<h3 class="mb-8">Weekly Summary</h3>
-<p id="tracking-summary" class="muted"></p>
-</div>
-<div class="card">
-<h3 class="mb-8">30-Day Goals</h3>
-<div id="tracking-goals"></div>
-</div>
-</div>
-
-<!-- EMERGENCY DONE -->
-<div id="pg-em-done" class="page">
-<div class="card text-center">
-<div class="encouragement" id="em-done-msg">You did something. That matters.</div>
-<button class="btn-primary btn-full mt-16" onclick="nav('dashboard')">Back to Dashboard</button>
-</div>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="nav-bottom">
-<button class="btn-secondary" onclick="nav('dashboard')">Home</button>
-<button class="btn-danger" onclick="nav('emergency')">EMERGENCY</button>
-<button class="btn-orange" onclick="nav('urge')">URGE</button>
-<button class="btn-secondary" onclick="nav('tracking')">Progress</button>
-</div>
-
-<!-- TIMER AUDIO -->
-<audio id="timer-audio" preload="auto">
-<source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACA" type="audio/wav">
-</audio>
 
 <script>
-// ===== DATA LAYER =====
-const STORE_KEY = 'mindhelp_data';
-function defaultData(){return{streak:0,dailyLogs:[],weeklyReviews:[],urgeLog:[],evidenceBank:[],contactExLog:[],lastTrack:'reset'}}
-function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||defaultData()}catch(e){return defaultData()}}
-function save(d){localStorage.setItem(STORE_KEY,JSON.stringify(d))}
-let D = load();
+/* ============================================================================
+   SITE SCRIPT
+   Wrapped in try/catch on each library so a single failure won't break the
+   whole page.
+============================================================================ */
 
-function today(){return new Date().toISOString().slice(0,10)}
-function todayLog(){return D.dailyLogs.find(l=>l.date===today())}
-function getOrCreateToday(){
-let log=todayLog();
-if(!log){log={date:today(),tier1Morning:false,tier1Evening:false,tier2Done:false,tier2Action:'',track:getTrack(),evidence:'',thoughts:'',tomorrow:'',emergencies:[],morningDone:false,eveningDone:false};D.dailyLogs.push(log);save(D)}
-return log;
-}
+document.documentElement.classList.add('js');
+document.getElementById('year').textContent = new Date().getFullYear();
+document.body.classList.add('cursor-on');
 
-function getTrack(){
-const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
-const yd=yesterday.toISOString().slice(0,10);
-const ylog=D.dailyLogs.find(l=>l.date===yd);
-if(!ylog)return'reset';
-if(ylog.eveningDone&&ylog.tier1Morning)return'momentum';
-if(ylog.emergencies&&ylog.emergencies.length>1)return'emergency';
-return'reset';
-}
+/* ----- Lenis smooth scroll (optional — page works without it) -------------- */
+let lenis;
+try {
+  if (window.Lenis) {
+    lenis = new Lenis({
+      duration: 1.1,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true, smoothTouch: false
+    });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  }
+} catch (e) { console.warn('Lenis failed to init:', e); }
 
-function calcStreak(){
-let streak=0;const d=new Date();
-for(let i=0;i<365;i++){
-const dt=new Date(d);dt.setDate(dt.getDate()-i);
-const ds=dt.toISOString().slice(0,10);
-const log=D.dailyLogs.find(l=>l.date===ds);
-if(log&&log.tier1Morning)streak++;else if(i>0)break;
-}
-D.streak=streak;save(D);return streak;
-}
 
-function thisWeekLogs(){
-const now=new Date();const dow=now.getDay()||7;
-const mon=new Date(now);mon.setDate(mon.getDate()-(dow-1));mon.setHours(0,0,0,0);
-return D.dailyLogs.filter(l=>new Date(l.date)>=mon);
+/* ----- Custom cursor ------------------------------------------------------- */
+const cursor = document.getElementById('cursor');
+let cx = -100, cy = -100, tx = -100, ty = -100;
+window.addEventListener('mousemove', (e) => { tx = e.clientX; ty = e.clientY; });
+function tickCursor() {
+  cx += (tx - cx) * 0.22;
+  cy += (ty - cy) * 0.22;
+  cursor.style.transform = `translate3d(${cx - 6}px, ${cy - 6}px, 0)`;
+  requestAnimationFrame(tickCursor);
 }
+tickCursor();
 
-function thisWeekUrges(){
-const now=new Date();const dow=now.getDay()||7;
-const mon=new Date(now);mon.setDate(mon.getDate()-(dow-1));mon.setHours(0,0,0,0);
-return D.urgeLog.filter(u=>new Date(u.date)>=mon);
-}
+document.querySelectorAll('a, button, .case-card, .article-card, .slide__card, .about__image')
+  .forEach((el) => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
+  });
 
-// ===== NAVIGATION =====
-function nav(page){
-document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-const el=document.getElementById('pg-'+page);
-if(el){el.classList.add('active');window.scrollTo(0,0)}
-if(page==='dashboard')renderDashboard();
-if(page==='tier2')renderTier2();
-if(page==='evening')renderEvening();
-if(page==='weekly')renderWeekly();
-if(page==='tracking')renderTracking();
-if(page==='urge')resetUrge();
-if(page==='morning')renderMorning();
+
+/* ----- GSAP / SplitType / ScrollTrigger setup ------------------------------ */
+const hasGSAP = !!window.gsap;
+const hasST   = !!(window.gsap && window.ScrollTrigger);
+const hasSplit = !!window.SplitType;
+
+if (hasST) gsap.registerPlugin(ScrollTrigger);
+if (lenis && hasST) {
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+  gsap.ticker.lagSmoothing(0);
 }
 
-// ===== DASHBOARD =====
-function renderDashboard(){
-const log=getOrCreateToday();
-const streak=calcStreak();
-const track=log.track||getTrack();
-const hour=new Date().getHours();
-const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const d=new Date();
-
-document.getElementById('dash-date').textContent=days[d.getDay()]+', '+months[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
-document.getElementById('dash-streak').textContent=streak+' day streak';
-
-const tb=document.getElementById('dash-track-badge');
-const tl={momentum:'Momentum Track',reset:'Reset Track',emergency:'Emergency Mode'};
-tb.innerHTML='<span class="track-badge track-'+track+'">'+tl[track]+'</span>';
-
-// Route info
-const ri=document.getElementById('dash-route-info');
-if(track==='momentum')ri.innerHTML='<p>You\'re on <b>Momentum Track</b> - keep the streak going!</p>';
-else if(track==='emergency')ri.innerHTML='<p><b>Emergency Mode</b> - survival is success. Only blood sugar is required today.</p>';
-else ri.innerHTML='<p><b>Reset Track</b> - just get back on. Minimum version today.</p>';
-
-// Nav buttons
-const nb=document.getElementById('dash-nav-buttons');
-let btns='';
-if(!log.tier1Morning&&hour<17)btns+='<button class="btn-primary btn-full btn-lg" onclick="nav(\'morning\')">Morning Check-In</button>';
-else if(log.tier1Morning&&!log.tier2Done)btns+='<button class="btn-primary btn-full btn-lg" onclick="nav(\'tier2\')">Midday - Pick Tier 2 Action</button>';
-if(hour>=17||log.tier1Morning)btns+='<button class="btn-secondary btn-full btn-lg" onclick="nav(\'evening\')">'+(log.eveningDone?'Evening Protocol (Done)':'Evening Protocol')+'</button>';
-if(d.getDay()===0)btns+='<button class="btn-secondary btn-full btn-lg" onclick="nav(\'weekly\')">Weekly Review (Sunday)</button>';
-btns+='<button class="btn-secondary btn-full" onclick="switchTrack()">Switch to '+(track==='emergency'?'Reset':'Emergency')+' Mode</button>';
-nb.innerHTML=btns;
-
-// Today status
-const ts=document.getElementById('dash-today-status');
-ts.innerHTML='<p>Morning Tier 1: '+(log.tier1Morning?'<span style="color:var(--green)">Complete</span>':'Pending')+'</p>'+
-'<p>Tier 2 Action: '+(log.tier2Done?'<span style="color:var(--green)">'+log.tier2Action+'</span>':'Not yet')+'</p>'+
-'<p>Evening Protocol: '+(log.eveningDone?'<span style="color:var(--green)">Complete</span>':'Pending')+'</p>';
+if (!hasSplit) {
+  document.querySelectorAll('[data-split]').forEach((el) => {
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+  });
+} else {
+  document.querySelectorAll('[data-split]').forEach((el) => {
+    new SplitType(el, { types: 'words,chars' });
+    el.style.opacity = '1';
+  });
 }
 
-function switchTrack(){
-const log=getOrCreateToday();
-log.track=log.track==='emergency'?'reset':'emergency';
-save(D);renderDashboard();
+if (hasGSAP && hasST && hasSplit) {
+  document.querySelectorAll('[data-split]').forEach((el) => {
+    if (el.closest('.hero')) return;
+    const chars = el.querySelectorAll('.char');
+    if (!chars.length) return;
+    gsap.set(chars, { yPercent: 110, opacity: 0 });
+    gsap.to(chars, {
+      scrollTrigger: { trigger: el, start: 'top 85%' },
+      yPercent: 0, opacity: 1,
+      duration: 0.7, ease: 'power3.out', stagger: 0.012
+    });
+  });
+
+  gsap.from('.intro__inner', {
+    scrollTrigger: { trigger: '.intro', start: 'top 80%', end: 'top 30%', scrub: true },
+    scale: 0.94, opacity: 0.5
+  });
 }
 
-// ===== MORNING =====
-function renderMorning(){
-const log=getOrCreateToday();
-if(log.tier1Morning){morningGoStep(4);return}
-morningGoStep(1);
-renderStepDots('morning-steps',3,0);
-}
-function morningCheck(){
-document.getElementById('morning-bs-next').disabled=!document.getElementById('morning-bs').checked;
-}
-function morningGoStep(s){
-for(let i=1;i<=3;i++){const el=document.getElementById('morning-step-'+i);if(el)el.style.display='none'}
-document.getElementById('morning-complete').style.display='none';
-if(s<=3){document.getElementById('morning-step-'+s).style.display='block';renderStepDots('morning-steps',3,s-1)}
-else document.getElementById('morning-complete').style.display='block';
-}
-function completeMorning(){
-const log=getOrCreateToday();
-log.tier1Morning=true;log.morningDone=true;
-log.freewrite=document.getElementById('morning-freewrite').value;
-log.medNotes=document.getElementById('morning-med-notes').value;
-save(D);calcStreak();morningGoStep(4);
+
+/* ============================================================================
+   HERO CAROUSEL
+============================================================================ */
+const hero       = document.getElementById('hero');
+const heroTrack  = document.getElementById('hero-track');
+const originalHeroSlides = Array.from(heroTrack.querySelectorAll('.slide'));
+const heroBars   = document.querySelectorAll('#progress-bars .progress-bar');
+const heroPrev   = document.getElementById('hero-prev');
+const heroNext   = document.getElementById('hero-next');
+const heroBgs    = document.querySelectorAll('.hero__bg-stack .hero__bg');
+
+const totalSlides = originalHeroSlides.length;
+let activeSlide = 0;
+let isDragging  = false;
+let dragStartX  = 0;
+let dragDelta   = 0;
+let isHeroAnimating = false;
+
+/* NO CLONES — true virtual carousel */
+const heroSlides = originalHeroSlides;
+
+function wrapIndex(index) {
+  return (index + totalSlides) % totalSlides;
 }
 
-// ===== TIER 2 =====
-let selectedTier2='';
-function renderTier2(){
-const dow=new Date().getDay();
-const label=document.getElementById('tier2-day-label');
-const opts=document.getElementById('tier2-options');
-document.getElementById('tier2-activity').style.display='none';
-document.getElementById('tier2-done').style.display='none';
-let options=[],duration=30;
-if([1,3,5].includes(dow)){
-label.textContent='Monday/Wednesday/Friday - Business/Career';
-options=['30 min job applications (one application, done properly)','30 min content website (one piece planned/created)','30 min client outreach for agency'];
-duration=30;
-}else if([2,4].includes(dow)){
-label.textContent='Tuesday/Thursday - Processing';
-options=['20 min relationship journaling','20 min financial reality check'];
-duration=20;
-}else{
-label.textContent='Weekend - Creative Recovery';
-options=['Work on one piece of content that excites you','Physical movement (walk, gym, anything)'];
-duration=30;
-}
-opts.innerHTML=options.map(o=>'<label class="radio-row"><input type="radio" name="tier2opt" value="'+o+'" onchange="selectTier2(this.value,'+duration+')"> '+o+'</label>').join('');
-}
-function selectTier2(val,dur){
-selectedTier2=val;
-document.getElementById('tier2-activity').style.display='block';
-document.getElementById('tier2-selected-label').textContent=val;
-initTimer('tier2',dur*60);
-}
-function completeTier2(){
-const log=getOrCreateToday();
-log.tier2Done=true;log.tier2Action=selectedTier2;
-log.tier2Notes=document.getElementById('tier2-notes').value;
-save(D);
-document.getElementById('tier2-activity').style.display='none';
-document.getElementById('tier2-done').style.display='block';
-const track=log.track||getTrack();
-document.getElementById('tier2-done-msg').textContent=track==='momentum'?"Great! You're building the frequency.":"You did the thing. Tomorrow you're back on Momentum.";
+function getPrevSlide(index) {
+  return wrapIndex(index - 1);
 }
 
-// ===== EVENING =====
-function renderEvening(){
-const log=getOrCreateToday();
-if(log.eveningDone){
-hideAllEveningSteps();
-document.getElementById('evening-complete').style.display='block';
-document.getElementById('evening-streak-display').textContent=D.streak+' day streak';
-return;
-}
-eveningGoStep(1);renderStepDots('evening-steps',5,0);
-}
-function hideAllEveningSteps(){
-for(let i=1;i<=5;i++){const el=document.getElementById('evening-step-'+i);if(el)el.style.display='none'}
-document.getElementById('evening-bs').style.display='none';
-document.getElementById('evening-reflect').style.display='none';
-document.getElementById('evening-complete').style.display='none';
-}
-function eveningGoStep(s){
-hideAllEveningSteps();
-if(s<=5){
-document.getElementById('evening-step-'+s).style.display='block';
-renderStepDots('evening-steps',5,s-1);
-if(s===5)renderEveningActivity();
-}
-if(s===6){document.getElementById('evening-bs').style.display='block'}
-if(s===7){document.getElementById('evening-reflect').style.display='block'}
-}
-function eveningBsCheck(){
-if(document.getElementById('evening-bs-check').checked)eveningGoStep(7);
-}
-function renderEveningActivity(){
-const track=getOrCreateToday().track||getTrack();
-const c=document.getElementById('evening-activity-content');
-if(track==='momentum'){
-c.innerHTML='<p class="muted mb-16">20-30 min creative/future work</p>'+
-'<label class="radio-row"><input type="radio" name="evact" value="Content creation"> Content creation</label>'+
-'<label class="radio-row"><input type="radio" name="evact" value="Business planning"> Business planning</label>'+
-'<label class="radio-row"><input type="radio" name="evact" value="Website work"> Website work</label>'+
-'<div class="timer-display" id="evact-timer">25:00</div>'+
-'<div class="timer-controls mb-16"><button class="btn-secondary" id="evact-timer-toggle" onclick="toggleTimer(\'evact\')">Start</button><button class="btn-secondary" onclick="resetTimer(\'evact\')">Reset</button></div>'+
-'<button class="btn-primary btn-full" onclick="eveningGoStep(6)">Done - Continue</button>';
-initTimer('evact',25*60);
-}else if(track==='reset'){
-c.innerHTML='<p class="muted mb-16">15 min processing</p>'+
-'<label class="radio-row"><input type="radio" name="evact" value="Grief journaling"> Grief journaling</label>'+
-'<label class="radio-row"><input type="radio" name="evact" value="Gentle reflection"> Gentle reflection</label>'+
-'<div class="timer-display" id="evact-timer">15:00</div>'+
-'<div class="timer-controls mb-16"><button class="btn-secondary" id="evact-timer-toggle" onclick="toggleTimer(\'evact\')">Start</button><button class="btn-secondary" onclick="resetTimer(\'evact\')">Reset</button></div>'+
-'<button class="btn-primary btn-full" onclick="eveningGoStep(6)">Done - Continue</button>';
-initTimer('evact',15*60);
-}else{
-c.innerHTML='<p class="muted mb-16">Rest is productive. Pick one comfort thing:</p>'+
-'<label class="radio-row"><input type="radio" name="evact" value="Read"> Read something</label>'+
-'<label class="radio-row"><input type="radio" name="evact" value="Music"> Listen to music</label>'+
-'<label class="radio-row"><input type="radio" name="evact" value="Nothing"> Nothing - just early bed</label>'+
-'<button class="btn-primary btn-full mt-16" onclick="eveningGoStep(6)">Done - Continue</button>';
-}
-}
-function completeEvening(){
-const log=getOrCreateToday();
-log.tier1Evening=true;log.eveningDone=true;
-const ev=document.getElementById('evening-evidence').value;
-if(ev){log.evidence=ev;D.evidenceBank.push({date:today(),text:ev})}
-log.thoughts=document.getElementById('evening-thought').value;
-log.tomorrow=document.getElementById('evening-tomorrow').value;
-const refl=document.getElementById('evening-reflect-text').value;
-if(refl)log.reflection=refl;
-save(D);calcStreak();
-hideAllEveningSteps();
-document.getElementById('evening-complete').style.display='block';
-document.getElementById('evening-streak-display').textContent=D.streak+' day streak';
+function getNextSlide(index) {
+  return wrapIndex(index + 1);
 }
 
-// ===== EMERGENCY =====
-function showEmergency(type){nav('em-'+type)}
-function logEmergencyAction(type,action){
-const log=getOrCreateToday();
-log.emergencies.push({type,action,time:new Date().toISOString()});
-save(D);
-document.getElementById('em-done-msg').textContent=
-type==='financial'?"You took action. That's what capable people do.":
-type==='relationship'?"Your awareness is growing. That's real progress.":
-type==='frozen'?"You moved. That's all it takes to break the freeze.":
-"You refocused. The value leads.";
-nav('em-done');
-}
-function logLackEmergency(){
-const sel=document.querySelector('input[name="lack-project"]:checked');
-if(!sel)return;
-logEmergencyAction('lack','Focus: '+sel.value);
+function setHeroBg(index) {
+  heroBgs.forEach((bg, i) => bg.classList.toggle('is-active', i === index));
+  const realSlide = originalHeroSlides[index];
+  const theme = realSlide.dataset.theme || 'light';
+  hero.setAttribute('data-theme', theme);
 }
 
-// ===== URGE PROTOCOL =====
-let currentUrge={type:'',state:'',option:'',outcome:'',rating:0};
-function resetUrge(){
-currentUrge={type:'',state:'',option:'',outcome:'',rating:0};
-document.getElementById('urge-step-1').style.display='block';
-document.getElementById('urge-step-2').style.display='none';
-document.getElementById('urge-step-3').style.display='none';
-}
-function selectUrgeType(t){
-currentUrge.type=t;
-if(t==='Contact ex'){nav('contact-ex');return}
-document.getElementById('urge-step-1').style.display='none';
-document.getElementById('urge-step-2').style.display='block';
-}
-function selectUrgeState(s){
-currentUrge.state=s;
-document.getElementById('urge-step-2').style.display='none';
-document.getElementById('urge-step-3').style.display='block';
-}
-function urgeFork(opt){
-currentUrge.option=opt;
-if(opt==='A'){
-nav('urge-a');
-initTimer('urgeA',20*60);
-document.getElementById('urgeA-after').style.display='none';
-const rr=document.getElementById('urgeA-rating');
-rr.innerHTML='';
-for(let i=1;i<=5;i++){
-const b=document.createElement('button');b.className='rating-btn';b.textContent=i;
-b.onclick=function(){currentUrge.rating=i;document.querySelectorAll('#urgeA-rating .rating-btn').forEach(x=>x.classList.remove('selected'));this.classList.add('selected')};
-rr.appendChild(b);
-}
-}else if(opt==='B'){
-nav('urge-b');
-initTimer('urgeB',5*60);
-document.getElementById('urgeB-after').style.display='none';
-renderUrgeAlternatives();
-}else{
-nav('emergency');
-}
-}
-function renderUrgeAlternatives(){
-const c=document.getElementById('urgeB-alternatives');
-let alts=[];
-if(currentUrge.type==='Junk food'){
-alts=['Drink full glass water + wait 2 min','Make tea/coffee','Eat something allowed but satisfying','5-min angry walk'];
-}else if(currentUrge.type==='Porn'){
-alts=['Cold water on face + 10 push-ups','5-min angry journaling','Text someone random chat','One angry song + movement'];
-}else{
-alts=['Write everything out (not to anyone)','Text someone else instead','5-min walk away from phone','Quick burst of exercise'];
-}
-c.innerHTML=alts.map(a=>'<label class="radio-row"><input type="radio" name="urgeBalt" value="'+a+'"> '+a+'</label>').join('');
-}
-function completeUrgeA(){
-currentUrge.outcome='conscious';
-D.urgeLog.push({date:today(),time:new Date().toISOString(),...currentUrge,need:document.getElementById('urgeA-need').value});
-save(D);nav('dashboard');
-}
-function completeUrgeB(){
-currentUrge.outcome='rode-it-out';
-D.urgeLog.push({date:today(),time:new Date().toISOString(),...currentUrge});
-save(D);
-document.getElementById('urgeB-after').style.display='none';
-nav('em-done');
-document.getElementById('em-done-msg').textContent="You rode it out! That's real strength.";
+function updateArrowState() {
+  heroPrev.disabled = false;
+  heroNext.disabled = false;
 }
 
-// ===== CONTACT EX =====
-function contactExWait(){
-const entry={date:today(),time:new Date().toISOString(),type:'Contact ex',action:'waiting-24h',
-message:document.getElementById('ex-message').value,
-hoping:document.getElementById('ex-hoping').value,
-patterns:document.getElementById('ex-patterns').value};
-D.contactExLog.push(entry);
-D.urgeLog.push({date:today(),time:new Date().toISOString(),type:'Contact ex',state:'',option:'wait',outcome:'waiting'});
-save(D);
-nav('em-done');
-document.getElementById('em-done-msg').textContent="Pin set. If you still want to send in 24 hours, you can. But you probably won't.";
-}
-function showExSubstitute(){document.getElementById('ex-substitute').style.display='block'}
-function logExSubstitute(sub){
-D.urgeLog.push({date:today(),time:new Date().toISOString(),type:'Contact ex',state:'',option:'substitute',outcome:sub});
-save(D);
-if(sub.includes('evening'))nav('evening');
-else{nav('em-done');document.getElementById('em-done-msg').textContent="Good call. You're meeting the real need.";}
+
+function getCardState(slideIndex, currentIndex) {
+  const w = heroTrack.clientWidth;
+  const prev = getPrevSlide(currentIndex);
+  const next = getNextSlide(currentIndex);
+
+  if (slideIndex === currentIndex) {
+    return { x: 0, scale: 1, opacity: 1, z: 4 };
+  }
+
+  if (slideIndex === prev) {
+    return { x: -w / 2, scale: 0.4, opacity: 1, z: 3 };
+  }
+
+  if (slideIndex === next) {
+    return { x: w / 2, scale: 0.4, opacity: 1, z: 3 };
+  }
+
+  return { x: 0, scale: 0.4, opacity: 0, z: 1 };
 }
 
-// ===== WEEKLY REVIEW =====
-let weeklyAnswers={q1:null,q2:null};
-function renderWeekly(){
-weeklyAnswers={q1:null,q2:null};
-const wl=thisWeekLogs();
-const t1=wl.filter(l=>l.tier1Morning).length;
-const t2=wl.filter(l=>l.tier2Done).length;
-document.getElementById('weekly-stats').innerHTML=
-'<div class="stat-card"><div class="num">'+t1+'/7</div><div class="label">Tier 1 Days</div></div>'+
-'<div class="stat-card"><div class="num">'+t2+'</div><div class="label">Tier 2 Actions</div></div>';
-// Chart
-renderWeeklyChart();
-// Reset button states
-['weekly-q1-yes','weekly-q1-no','weekly-q2-yes','weekly-q2-no'].forEach(id=>{
-document.getElementById(id).style.background='';document.getElementById(id).style.color='';
+function setCardState(card, state, animate = false) {
+  if (!card) return;
+
+  card.style.zIndex = state.z;
+  card.style.pointerEvents = state.z === 4 ? 'auto' : 'none';
+
+  if (hasGSAP) {
+
+    if (state.opacity === 0) {
+      gsap.set(card, {
+        x: state.x,
+        y: 0,
+        scale: state.scale,
+        opacity: 0,
+        rotateX: 0,
+        rotateY: 0
+      });
+      return;
+    }
+
+    const isActive = state.z === 4;
+    const isPeeking = state.z === 3;
+
+    gsap.to(card, {
+      x: state.x,
+      y: 0,
+      scale: state.scale,
+      opacity: state.opacity,
+      rotateX: 0,
+      rotateY: 0,
+      duration: animate
+        ? (isPeeking ? 0.6 : 0.75)
+        : 0,
+      ease: isPeeking
+        ? 'power2.out'     // softer, more natural fade
+        : 'power3.inOut',  // keep main card premium
+      overwrite: true
+    });
+
+  } else {
+    card.style.opacity = state.opacity;
+    card.style.transform = `translateX(${state.x}px) scale(${state.scale})`;
+  }
+}
+function layoutHeroCards(currentIndex, animate = false) {
+  heroSlides.forEach((slide, i) => {
+    const card = slide.querySelector('.slide__card');
+    setCardState(card, getCardState(i, currentIndex), animate);
+  });
+}
+
+function layoutHeroCardsForDrag(deltaX) {
+  const w = heroTrack.clientWidth;
+  const progress = Math.min(1, Math.abs(deltaX) / w);
+  const movingNext = deltaX < 0;
+
+  const current = activeSlide;
+  const target = movingNext ? getNextSlide(current) : getPrevSlide(current);
+  const opposite = movingNext ? getPrevSlide(current) : getNextSlide(current);
+
+  heroSlides.forEach((slide, i) => {
+    const card = slide.querySelector('.slide__card');
+    let state = { x: 0, scale: 0.4, opacity: 0, z: 1 };
+
+    if (i === current) {
+      state = movingNext
+        ? {
+            x: gsap.utils.interpolate(0, -w / 2, progress),
+            scale: gsap.utils.interpolate(1, 0.4, progress),
+            opacity: 1,
+            z: 4
+          }
+        : {
+            x: gsap.utils.interpolate(0, w / 2, progress),
+            scale: gsap.utils.interpolate(1, 0.4, progress),
+            opacity: 1,
+            z: 4
+          };
+    } else if (i === target) {
+      state = movingNext
+        ? {
+            x: gsap.utils.interpolate(w / 2, 0, progress),
+            scale: gsap.utils.interpolate(0.4, 1, progress),
+            opacity: 1,
+            z: 4
+          }
+        : {
+            x: gsap.utils.interpolate(-w / 2, 0, progress),
+            scale: gsap.utils.interpolate(0.4, 1, progress),
+            opacity: 1,
+            z: 4
+          };
+    } else if (i === opposite) {
+      state = movingNext
+        ? { x: -w / 2, scale: 0.4, opacity: 1, z: 3 }
+        : { x: w / 2, scale: 0.4, opacity: 1, z: 3 };
+    }
+
+    setCardState(card, state, false);
+  });
+}
+
+/* Reveal sequence: HEADLINE → IMAGE (card) → PARAGRAPH */
+function revealSlide(slide, options = {}) {
+  if (!hasGSAP) return;
+
+  const animateCard = options.animateCard !== false;
+  const titleChars = slide.querySelectorAll('.slide__title .char');
+  const card       = slide.querySelector('.slide__card');
+  const copy       = slide.querySelector('.slide__copy');
+  const shapes     = slide.querySelectorAll('.slide__shape');
+
+  if (titleChars.length) gsap.set(titleChars, { yPercent: 110, opacity: 0 });
+  if (animateCard) gsap.set(card, { opacity: 0, scale: 0.85, y: 30, x: 0 });
+  gsap.set(copy,   { opacity: 0, y: 20 });
+gsap.set(shapes, { opacity: 0, scale: 0.6 });
+
+  const tl = gsap.timeline();
+
+  tl.to(titleChars, {
+    yPercent: 0,
+    opacity: 1,
+    duration: 0.7,
+    ease: 'power3.out',
+    stagger: 0.018
+  });
+
+  if (animateCard) {
+    tl.to(card, {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      x: 0,
+      duration: 0.8,
+      ease: 'power3.out'
+    }, '-=0.4');
+  }
+
+  tl.to(shapes, {
+    opacity: 1,
+    scale: 1,
+    duration: 0.6,
+    ease: 'back.out(1.5)',
+    stagger: 0.08
+  }, '-=0.6')
+  .to(copy, {
+    opacity: 1,
+    y: 0,
+    duration: 0.5,
+    ease: 'power3.out'
+  }, '-=0.4');
+}
+function forceSlideContentVisible(slide) {
+  if (!slide || !hasGSAP) return;
+
+  const titleChars = slide.querySelectorAll('.slide__title .char');
+  const card       = slide.querySelector('.slide__card');
+  const copy       = slide.querySelector('.slide__copy');
+  const shapes     = slide.querySelectorAll('.slide__shape');
+
+  gsap.killTweensOf([titleChars, card, copy, shapes]);
+
+  gsap.set(titleChars, { yPercent: 0, opacity: 1 });
+  gsap.set(copy, { opacity: 1, y: 0 });
+  gsap.set(shapes, { opacity: 1, scale: 1 });
+}
+function syncHeroState() {
+  heroSlides.forEach((slide, i) => {
+    slide.classList.toggle('is-active', i === activeSlide);
+  });
+
+  setHeroBg(activeSlide);
+  heroBars.forEach((b, i) => b.classList.toggle('is-active', i === activeSlide));
+  updateArrowState();
+}
+
+
+function goToSlide(index) {
+  if (isHeroAnimating) return;
+
+  const from = activeSlide;
+  const to = wrapIndex(index);
+  if (to === from) return;
+
+  const w = heroTrack.clientWidth;
+
+const movingNext = index === from + 1 || (from === totalSlides - 1 && index === totalSlides);
+
+
+  isHeroAnimating = true;
+  activeSlide = to;
+
+  syncHeroState();
+
+const newIncomingSideCard = movingNext
+  ? getNextSlide(to)
+  : getPrevSlide(to);
+
+heroSlides.forEach((slide, i) => {
+  const card = slide.querySelector('.slide__card');
+  let state = getCardState(i, to);
+
+  if (i === newIncomingSideCard) {
+    state = { x: movingNext ? w : -w, scale: 0.4, opacity: 0, z: 1 };
+  }
+
+  setCardState(card, state, true);
+});
+  revealSlide(heroSlides[activeSlide], { animateCard: false });
+
+  if (hasGSAP) {
+gsap.delayedCall(0.35, () => {
+  const peekCard = heroSlides[newIncomingSideCard].querySelector('.slide__card');
+  const peekState = getCardState(newIncomingSideCard, activeSlide);
+
+  setCardState(peekCard, peekState, true);
+});
+
+gsap.delayedCall(0.75, () => {
+  isHeroAnimating = false;
+});
+  } else {
+    setTimeout(() => {
+      layoutHeroCards(activeSlide, false);
+      isHeroAnimating = false;
+    }, 750);
+  }
+}
+
+
+/* Pre-hide hero slide 0 content synchronously, so there's no flash of
+   visible content between page paint and the reveal animation starting. */
+if (hasGSAP) {
+  const s0 = originalHeroSlides[0];
+  gsap.set(s0.querySelectorAll('.slide__title .char'), { yPercent: 110, opacity: 0 });
+  gsap.set(s0.querySelector('.slide__card'),  { opacity: 0, scale: 0.85, y: 30 });
+  gsap.set(s0.querySelector('.slide__copy'),  { opacity: 0, y: 20 });
+  gsap.set(s0.querySelectorAll('.slide__shape'), { opacity: 0, scale: 0 });
+}
+
+/* Initial bg + reveal. */
+syncHeroState();
+
+/* Hide side cards initially */
+heroSlides.forEach((slide, i) => {
+  const card = slide.querySelector('.slide__card');
+
+  if (i !== activeSlide) {
+    if (hasGSAP) {
+      gsap.set(card, { opacity: 0 });
+    } else {
+      card.style.opacity = 0;
+    }
+  }
+});
+
+/* Only position active instantly */
+layoutHeroCards(activeSlide, false);
+
+/* Animate side cards AFTER main reveal */
+function animateSideCardsIn() {
+  const w = heroTrack.clientWidth;
+
+  const prev = getPrevSlide(activeSlide);
+  const next = getNextSlide(activeSlide);
+
+  const prevCard = heroSlides[prev].querySelector('.slide__card');
+  const nextCard = heroSlides[next].querySelector('.slide__card');
+
+  if (!hasGSAP) {
+    layoutHeroCards(activeSlide, true);
+    return;
+  }
+
+  gsap.fromTo(prevCard,
+    { x: -w, scale: 0.4, opacity: 0 },
+    { x: -w / 2, scale: 0.4, opacity: 1, duration: 0.7, ease: 'power3.out' }
+  );
+
+  gsap.fromTo(nextCard,
+    { x: w, scale: 0.4, opacity: 0 },
+    { x: w / 2, scale: 0.4, opacity: 1, duration: 0.7, ease: 'power3.out' }
+  );
+}
+if (hasGSAP) {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+revealSlide(heroSlides[activeSlide]);
+
+gsap.delayedCall(1.55, () => {
+  hero.classList.remove('hero--loading');
+  animateSideCardsIn();
+});
+  }));
+}
+
+/* Failsafe */
+setTimeout(() => {
+  if (!hasGSAP) return;
+  const s = originalHeroSlides[0];
+  const card = s.querySelector('.slide__card');
+
+  if (card && getComputedStyle(card).opacity === '0') {
+    gsap.set(s.querySelectorAll('.slide__title .char'), { yPercent: 0, opacity: 1 });
+    gsap.set(card, { opacity: 1, scale: 1, y: 0, x: 0 });
+    gsap.set(s.querySelector('.slide__copy'), { opacity: 1, y: 0 });
+    gsap.set(s.querySelectorAll('.slide__shape'), { opacity: 1, scale: 1 });
+    layoutHeroCards(activeSlide, false, { skipActive: true });
+  }
+}, 3000);
+
+/* Scroll-driven white fade */
+if (hasST) {
+gsap.to('#hero-bg-fade', {
+  opacity: 1,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '.hero',
+    start: 'top top',
+    end: '7% top',
+    scrub: 0.6
+  }
 });
 }
-function weeklyAnswer(q,v){
-weeklyAnswers['q'+q]=v;
-const y=document.getElementById('weekly-q'+q+'-yes');
-const n=document.getElementById('weekly-q'+q+'-no');
-if(v){y.style.background='var(--green)';y.style.color='#fff';n.style.background='';n.style.color=''}
-else{n.style.background='var(--accent)';n.style.color='#fff';y.style.background='';y.style.color=''}
-}
-function completeWeekly(){
-if(weeklyAnswers.q1===null||weeklyAnswers.q2===null)return;
-D.weeklyReviews.push({date:today(),...weeklyAnswers,learned:document.getElementById('weekly-learned').value});
-save(D);
-nav('em-done');
-document.getElementById('em-done-msg').textContent="Weekly review complete. New week, fresh start.";
-}
-function renderWeeklyChart(){
-const el=document.getElementById('weekly-chart');
-const weeks=[];
-for(let w=3;w>=0;w--){
-const start=new Date();start.setDate(start.getDate()-start.getDay()-w*7+1);
-let count=0;
-for(let d=0;d<7;d++){
-const dt=new Date(start);dt.setDate(dt.getDate()+d);
-const ds=dt.toISOString().slice(0,10);
-const log=D.dailyLogs.find(l=>l.date===ds);
-if(log&&log.tier1Morning)count++;
-}
-weeks.push(count);
-}
-el.innerHTML='<div class="chart-bar-container">'+weeks.map(c=>'<div class="chart-bar" style="height:'+Math.max(c/7*100,3)+'%"></div>').join('')+'</div>'+
-'<div class="chart-labels"><span>3w ago</span><span>2w ago</span><span>Last wk</span><span>This wk</span></div>';
+	
+	gsap.to('.hero-stage, .hero-nav, .hero__wordmark', {
+  y: -120,
+  opacity: 0,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '.hero',
+    start: 'top top',
+    end: '40% top',
+    scrub: true
+  }
+});
+
+/* Arrow buttons */
+heroPrev.addEventListener('click', () => goToSlide(activeSlide - 1));
+heroNext.addEventListener('click', () => goToSlide(activeSlide + 1));
+
+/* Progress bar buttons */
+heroBars.forEach((bar) => {
+  bar.addEventListener('click', () => {
+    const targetRealIndex = parseInt(bar.dataset.targetSlide, 10);
+
+    if (targetRealIndex === activeSlide) return;
+
+    /* Keep progress-bar jumps direct. Arrows/swipes handle seamless edge looping. */
+    goToSlide(targetRealIndex);
+  });
+});
+
+/* Drag / swipe via Pointer Events */
+heroTrack.addEventListener('pointerdown', (e) => {
+  if (isHeroAnimating) return;
+
+  isDragging = true;
+  dragStartX = e.clientX;
+  dragDelta  = 0;
+
+  heroTrack.setPointerCapture(e.pointerId);
+});
+
+heroTrack.addEventListener('pointermove', (e) => {
+  if (!isDragging) return;
+
+  dragDelta = e.clientX - dragStartX;
+
+layoutHeroCardsForDrag(dragDelta);
+});
+
+function endDrag() {
+  if (!isDragging) return;
+
+  isDragging = false;
+
+  const threshold = heroTrack.clientWidth * 0.12;
+
+if (dragDelta < -threshold) {
+  goToSlide(activeSlide + 1);
+} else if (dragDelta > threshold) {
+  goToSlide(activeSlide - 1);
+} else {
+  layoutHeroCards(activeSlide, true);
 }
 
-// ===== TRACKING =====
-function renderTracking(){
-const streak=calcStreak();
-const wl=thisWeekLogs();
-const t1=wl.filter(l=>l.tier1Morning).length;
-const t2=wl.filter(l=>l.tier2Done).length;
-const track=getOrCreateToday().track||getTrack();
-document.getElementById('tracking-status').innerHTML=
-'<div class="stat-card"><div class="num">'+streak+'</div><div class="label">Day Streak</div></div>'+
-'<div class="stat-card"><div class="num">'+t1+'/7</div><div class="label">Tier 1 This Week</div></div>'+
-'<div class="stat-card"><div class="num">'+t2+'</div><div class="label">Tier 2 Actions</div></div>'+
-'<div class="stat-card"><div class="num track-badge track-'+track+'" style="font-size:1rem">'+track+'</div><div class="label">Current Track</div></div>';
-
-// Urge log
-const wu=thisWeekUrges();
-const byType={};wu.forEach(u=>{byType[u.type]=(byType[u.type]||0)+1});
-const conscious=wu.filter(u=>u.outcome==='conscious'||u.outcome==='rode-it-out').length;
-let urgeHtml='';
-Object.keys(byType).forEach(t=>{urgeHtml+='<p>'+t+': '+byType[t]+'</p>'});
-urgeHtml+='<p class="muted mt-16">Conscious choices: '+conscious+'/'+wu.length+'</p>';
-if(wu.length>0){
-const hours=wu.map(u=>new Date(u.time).getHours());
-const avg=Math.round(hours.reduce((a,b)=>a+b,0)/hours.length);
-urgeHtml+='<p class="muted">Peak time: ~'+avg+':00</p>';
-const states={};wu.forEach(u=>{if(u.state)states[u.state]=(states[u.state]||0)+1});
-const topState=Object.keys(states).sort((a,b)=>states[b]-states[a])[0];
-if(topState)urgeHtml+='<p class="muted">Primary trigger: '+topState+'</p>';
-}
-document.getElementById('tracking-urges').innerHTML=urgeHtml||'<p class="muted">No urges logged this week</p>';
-
-// Evidence bank
-const evHtml=D.evidenceBank.slice(-20).reverse().map(e=>'<div class="evidence-item">'+escHtml(e.text)+'<br><span class="muted" style="font-size:.8rem">'+e.date+'</span></div>').join('');
-document.getElementById('tracking-evidence').innerHTML=evHtml||'<p class="muted">No evidence collected yet</p>';
-document.getElementById('tracking-evidence').innerHTML+='<p class="muted mt-16">'+D.evidenceBank.length+' pieces of evidence collected</p>';
-
-// Chart
-renderWeeklyChart2();
-
-// Summary
-const allLogs=D.dailyLogs;
-const trend=t1>=5?'improving':t1>=3?'maintaining':'struggling';
-document.getElementById('tracking-summary').textContent=
-'This week you completed Tier 1 '+t1+' days, took '+t2+' forward actions'+
-(wu.length>0?', and paused before acting on urges '+conscious+' times':'')+
-'. Trend: '+trend+'.';
-
-// 30-day goals
-const last30=allLogs.filter(l=>{const d=new Date(l.date);const ago=new Date();ago.setDate(ago.getDate()-30);return d>=ago});
-const t1_30=last30.filter(l=>l.tier1Morning).length;
-const t2_30=last30.filter(l=>l.tier2Done).length;
-const em_30=last30.filter(l=>l.track==='emergency').length;
-document.getElementById('tracking-goals').innerHTML=
-'<p>Tier 1 done: '+t1_30+'/20+ days goal</p>'+
-'<div class="progress-bar"><div class="progress-bar-fill" style="width:'+Math.min(t1_30/20*100,100)+'%"></div></div>'+
-'<p>Forward actions: '+t2_30+'/12+ goal</p>'+
-'<div class="progress-bar"><div class="progress-bar-fill" style="width:'+Math.min(t2_30/12*100,100)+'%"></div></div>'+
-'<p>Evidence collected: '+D.evidenceBank.length+'</p>'+
-'<p>Emergency days (fewer is better): '+em_30+'</p>';
-}
-function renderWeeklyChart2(){
-const el=document.getElementById('tracking-chart');
-const weeks=[];
-for(let w=3;w>=0;w--){
-const start=new Date();start.setDate(start.getDate()-start.getDay()-w*7+1);
-let count=0;
-for(let d=0;d<7;d++){
-const dt=new Date(start);dt.setDate(dt.getDate()+d);
-const ds=dt.toISOString().slice(0,10);
-const log=D.dailyLogs.find(l=>l.date===ds);
-if(log&&log.tier1Morning)count++;
-}
-weeks.push(count);
-}
-el.innerHTML='<div class="chart-bar-container">'+weeks.map(c=>'<div class="chart-bar" style="height:'+Math.max(c/7*100,3)+'%"></div>').join('')+'</div>'+
-'<div class="chart-labels"><span>3w ago</span><span>2w ago</span><span>Last wk</span><span>This wk</span></div>';
+  dragDelta = 0;
 }
 
-// ===== TIMERS =====
-const timers={};
-function initTimer(name,seconds){
-if(timers[name]&&timers[name].interval)clearInterval(timers[name].interval);
-timers[name]={total:seconds,remaining:seconds,interval:null,running:false};
-renderTimer(name);
-}
-function renderTimer(name){
-const t=timers[name];if(!t)return;
-const m=Math.floor(t.remaining/60);const s=t.remaining%60;
-const el=document.getElementById(name+'-timer');
-if(el)el.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-}
-function toggleTimer(name){
-const t=timers[name];if(!t)return;
-if(t.running){
-clearInterval(t.interval);t.running=false;
-const btn=document.getElementById(name+'-timer-toggle');if(btn)btn.textContent='Resume';
-}else{
-t.running=true;
-const btn=document.getElementById(name+'-timer-toggle');if(btn)btn.textContent='Pause';
-t.interval=setInterval(()=>{
-t.remaining--;
-if(t.remaining<=0){
-clearInterval(t.interval);t.remaining=0;t.running=false;
-renderTimer(name);timerDone(name);return;
-}
-renderTimer(name);
-},1000);
-}
-}
-function resetTimer(name){
-const t=timers[name];if(!t)return;
-if(t.interval)clearInterval(t.interval);
-t.remaining=t.total;t.running=false;
-renderTimer(name);
-const btn=document.getElementById(name+'-timer-toggle');if(btn)btn.textContent='Start';
-}
-function timerDone(name){
-try{
-const ctx=new(window.AudioContext||window.webkitAudioContext)();
-for(let i=0;i<3;i++){
-const o=ctx.createOscillator();const g=ctx.createGain();
-o.connect(g);g.connect(ctx.destination);
-o.frequency.value=800;o.type='sine';
-g.gain.value=0.3;
-o.start(ctx.currentTime+i*0.3);o.stop(ctx.currentTime+i*0.3+0.2);
-}
-}catch(e){}
-const btn=document.getElementById(name+'-timer-toggle');if(btn)btn.textContent='Done';
-// Show after-sections
-if(name==='urgeA')document.getElementById('urgeA-after').style.display='block';
-if(name==='urgeB')document.getElementById('urgeB-after').style.display='block';
-if(name==='frozen')document.getElementById('frozen-done-msg').style.display='block';
-}
+heroTrack.addEventListener('pointerup', endDrag);
+heroTrack.addEventListener('pointercancel', endDrag);
 
-// ===== UTILITIES =====
-function renderStepDots(containerId,total,activeIdx){
-const c=document.getElementById(containerId);
-c.innerHTML='';
-for(let i=0;i<total;i++){
-const d=document.createElement('div');
-d.className='step-dot'+(i<activeIdx?' done':i===activeIdx?' active':'');
-c.appendChild(d);
-}
-}
-function updateWordCount(textareaId,countId){
-const words=document.getElementById(textareaId).value.trim().split(/\s+/).filter(w=>w).length;
-document.getElementById(countId).textContent=words+' words (aim for ~500)';
-}
-function escHtml(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+/* Re-snap to active slide on resize so transform stays correct */
+window.addEventListener('resize', () => {
+  const activeCard = heroSlides[activeSlide].querySelector('.slide__card');
+setCardState(activeCard, getCardState(activeSlide, activeSlide), false);
+});
 
-// ===== INIT =====
-initTimer('morningMed',10*60);
-initTimer('frozen',5*60);
-renderDashboard();
+/* ----- 3D mouse-tilt on the active slide's card --------------------------- */
+heroTrack.addEventListener('mousemove', (e) => {
+const activeVisualSlide = heroSlides[activeSlide];
+const card = activeVisualSlide ? activeVisualSlide.querySelector('.slide__card') : null;
+
+  if (!card || isHeroAnimating || isDragging || !hasGSAP) return;
+
+  const rect = card.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top  + rect.height / 2;
+  const dx = (e.clientX - cx) / rect.width;
+  const dy = (e.clientY - cy) / rect.height;
+
+  gsap.to(card, {
+    rotateY: dx * 8,
+    rotateX: -dy * 8,
+    transformPerspective: 1000,
+    duration: 0.2,
+    ease: 'power2.out',
+    overwrite: 'auto'
+  });
+});
+
+heroTrack.addEventListener('mouseleave', () => {
+const activeVisualSlide = heroSlides[activeSlide];
+const card = activeVisualSlide ? activeVisualSlide.querySelector('.slide__card') : null;
+
+  if (card && hasGSAP) {
+    gsap.to(card, {
+      rotateX: 0,
+      rotateY: 0,
+      duration: 0.3,
+      ease: 'power2.out',
+      overwrite: 'auto'
+    });
+  }
+});
+	
+/* ============================================================================
+   RANDOMISE SHAPE POSITIONS
+   Makes each decorative shape feel organically placed (not grid-like)
+============================================================================ */
+function randomiseShapes() {
+  const slides = document.querySelectorAll('.slide');
+
+  const safePositions = [
+    { top: 14, left: 10 },
+    { top: 18, left: 76 },
+    { top: 62, left: 12 },
+    { top: 66, left: 74 },
+    { top: 36, left: 6 },
+    { top: 38, left: 82 }
+  ];
+
+  slides.forEach((slide) => {
+    const shapes = slide.querySelectorAll('.slide__shape');
+
+    shapes.forEach((shape, i) => {
+      const base = safePositions[i % safePositions.length];
+
+      const jitterX = (Math.random() - 0.5) * 8;
+      const jitterY = (Math.random() - 0.5) * 8;
+      const rotate = (Math.random() - 0.5) * 24;
+      const scale = Math.random() * 0.25 + 0.9;
+
+      shape.style.top = `${base.top + jitterY}%`;
+      shape.style.left = `${base.left + jitterX}%`;
+      shape.style.right = 'auto';
+      shape.style.bottom = 'auto';
+      shape.style.transform = `rotate(${rotate}deg) scale(${scale})`;
+    });
+  });
+}
+/* ============================================================================
+   FLOATING SHAPE ANIMATION (natural, varied motion)
+============================================================================ */
+function animateFloatingShapes() {
+  if (!hasGSAP) return;
+
+  document.querySelectorAll('.slide__shape').forEach((shape) => {
+
+    // Random movement range
+    const moveX = (Math.random() - 0.5) * 40; // -20 → +20px
+    const moveY = (Math.random() - 0.5) * 40;
+
+    // Random rotation drift
+    const rotate = (Math.random() - 0.5) * 20;
+
+    // Random duration (slower = more premium)
+    const duration = Math.random() * 3 + 4; // 4 → 7s
+
+    // Random delay so nothing starts together
+    const delay = Math.random() * 2;
+
+    gsap.to(shape, {
+      x: `+=${moveX}`,
+      y: `+=${moveY}`,
+      rotation: `+=${rotate}`,
+      duration: duration,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+      delay: delay
+    });
+  });
+}
+	/* Run once on page load */
+randomiseShapes();
+animateFloatingShapes();
+	
+/* ============================================================================
+   JOURNAL CAROUSEL
+============================================================================ */
+const journalTrack = document.getElementById('journal-track');
+const journalPrev  = document.getElementById('journal-prev');
+const journalNext  = document.getElementById('journal-next');
+let journalOffset  = 0;
+
+function getJournalStep() {
+  const card = journalTrack.querySelector('.article-card');
+  return card ? card.offsetWidth + 16 : 0;
+}
+function getMaxJournalOffset() {
+  return -(journalTrack.scrollWidth - journalTrack.parentElement.clientWidth);
+}
+function setJournalOffset(value, withTransition) {
+  journalOffset = Math.max(getMaxJournalOffset(), Math.min(0, value));
+  journalTrack.style.transition = withTransition === false ? 'none' : '';
+  journalTrack.style.transform  = `translateX(${journalOffset}px)`;
+}
+journalPrev.addEventListener('click', () => setJournalOffset(journalOffset + getJournalStep()));
+journalNext.addEventListener('click', () => setJournalOffset(journalOffset - getJournalStep()));
+
+let jDragging = false, jStartX = 0, jStartOffset = 0;
+journalTrack.addEventListener('pointerdown', (e) => {
+  jDragging = true; jStartX = e.clientX; jStartOffset = journalOffset;
+  journalTrack.setPointerCapture(e.pointerId);
+});
+journalTrack.addEventListener('pointermove', (e) => {
+  if (!jDragging) return;
+  setJournalOffset(jStartOffset + (e.clientX - jStartX), false);
+});
+function endJDrag() {
+  if (!jDragging) return;
+  jDragging = false;
+  setJournalOffset(journalOffset, true);
+}
+journalTrack.addEventListener('pointerup', endJDrag);
+journalTrack.addEventListener('pointercancel', endJDrag);
+window.addEventListener('resize', () => setJournalOffset(journalOffset));
 </script>
+
 </body>
 </html>
